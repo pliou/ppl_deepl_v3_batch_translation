@@ -1,0 +1,29 @@
+{
+  "name": "ppl/ppl-deepl-v3-batch-translation",
+  "description": "TYPO3 backend module for PPL DeepL V3 batch translation",
+  "type": "typo3-cms-extension",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Pawel Pliousnin",
+      "email": "pliousnin@ppl-ds.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "typo3/cms-core": "^12.4",
+    "typo3/cms-backend": "^12.4",
+    "ppl/ppl-deepl-v3-requests": "@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ppl\\PplDeeplV3BatchTranslation\\": "Classes/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "ppl_deepl_v3_batch_translation"
+    }
+  }
+}

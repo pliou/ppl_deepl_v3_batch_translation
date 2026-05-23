@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2026-05-22T00:00:00Z" product-name="ppl_deepl_v3_batch_translation">
+        <header/>
+        <body>
+            <trans-unit id="module.root.title"><source>PPL DeepL</source><target>PPL DeepL</target></trans-unit>
+            <trans-unit id="module.root.description"><source>PPL DeepL translations.</source><target>PPL DeepL &#220;bersetzungen.</target></trans-unit>
+            <trans-unit id="module.batch.title"><source>PPL DeepL V3 Batch Translation</source><target>PPL DeepL V3 Massen&#252;bersetzung</target></trans-unit>
+            <trans-unit id="module.batch.description"><source>Controlled DeepL V3 batch translation for page trees.</source><target>Steuerbare DeepL V3 Massen&#252;bersetzung f&#252;r Seitenb&#228;ume.</target></trans-unit>
+            <trans-unit id="batch.title"><source>PPL DeepL V3 Batch Translation</source><target>PPL DeepL V3 Massen&#252;bersetzung</target></trans-unit>
+            <trans-unit id="batch.intro"><source>Inspect a page tree, content translation status and access limits before starting controlled batch translation.</source><target>Pr&#252;ft Seitenbaum, Content-Status und Zugriffsbeschr&#228;nkungen vor der steuerbaren Massen&#252;bersetzung.</target></trans-unit>
+            <trans-unit id="batch.phaseNoticeTitle"><source>Controlled translation</source><target>Kontrollierte &#220;bersetzung</target></trans-unit>
+            <trans-unit id="batch.phaseNotice"><source>Selected pages and elements are localized through TYPO3 DataHandler before translated text fields are written.</source><target>Ausgew&#228;hlte Seiten und Elemente werden zuerst per TYPO3 DataHandler lokalisiert, bevor die &#252;bersetzten Textfelder geschrieben werden.</target></trans-unit>
+            <trans-unit id="batch.rootPage"><source>Root page</source><target>Startseite</target></trans-unit>
+            <trans-unit id="batch.targetLanguage"><source>Target language</source><target>Zielsprache</target></trans-unit>
+            <trans-unit id="batch.pages"><source>Pages</source><target>Seiten</target></trans-unit>
+            <trans-unit id="batch.elements"><source>Elements</source><target>Elemente</target></trans-unit>
+            <trans-unit id="batch.blocked"><source>No access</source><target>Kein Zugriff</target></trans-unit>
+            <trans-unit id="batch.tree"><source>Page tree</source><target>Seitenbaum</target></trans-unit>
+            <trans-unit id="batch.treeHint"><source>Open pages to inspect contained elements.</source><target>Seiten aufklappen, um enthaltene Elemente zu pr&#252;fen.</target></trans-unit>
+            <trans-unit id="batch.emptyTree"><source>No pages were found below the site root.</source><target>Unter der Site-Startseite wurden keine Seiten gefunden.</target></trans-unit>
+            <trans-unit id="batch.targetLanguageMissingTitle"><source>No target language configured</source><target>Keine Zielsprache konfiguriert</target></trans-unit>
+            <trans-unit id="batch.targetLanguageMissing"><source>Add a second site language first. Batch translation needs an existing TYPO3 target language.</source><target>Zuerst eine zweite Site-Sprache anlegen. Die Massen&#252;bersetzung braucht eine vorhandene TYPO3-Zielsprache.</target></trans-unit>
+            <trans-unit id="batch.status.missing"><source>Not translated</source><target>Nicht &#252;bersetzt</target></trans-unit>
+            <trans-unit id="batch.status.partial"><source>Partially translated</source><target>Teilweise &#252;bersetzt</target></trans-unit>
+            <trans-unit id="batch.status.translated"><source>Translated</source><target>&#220;bersetzt</target></trans-unit>
+            <trans-unit id="batch.action.translate"><source>Translate</source><target>&#220;bersetzen</target></trans-unit>
+            <trans-unit id="batch.action.retranslate"><source>Retranslate</source><target>Erneut &#252;bersetzen</target></trans-unit>
+            <trans-unit id="batch.action.translateMissing"><source>Translate missing</source><target>Fehlende &#252;bersetzen</target></trans-unit>
+            <trans-unit id="batch.action.translateSelected"><source>Translate selected</source><target>Auswahl &#252;bersetzen</target></trans-unit>
+            <trans-unit id="batch.action.translateSelectedMissing"><source>Translate selected missing records</source><target>Fehlende der Auswahl &#252;bersetzen</target></trans-unit>
+            <trans-unit id="batch.action.refresh"><source>Update view</source><target>Ansicht aktualisieren</target></trans-unit>
+            <trans-unit id="batch.options"><source>Translation options</source><target>&#220;bersetzungsoptionen</target></trans-unit>
+            <trans-unit id="batch.optionsHint"><source>These settings are used for the next batch run and for the current status view.</source><target>Diese Einstellungen gelten f&#252;r den n&#228;chsten Batch-Lauf und die aktuelle Statusansicht.</target></trans-unit>
+            <trans-unit id="batch.glossary"><source>Glossary</source><target>Glossar</target></trans-unit>
+            <trans-unit id="batch.glossary.none"><source>No glossary</source><target>Kein Glossar</target></trans-unit>
+            <trans-unit id="batch.glossary.help"><source>Only approved glossaries for this language pair are shown.</source><target>Es werden nur freigegebene Glossare f&#252;r diese Sprachkombination angezeigt.</target></trans-unit>
+            <trans-unit id="batch.glossary.empty"><source>No approved glossary is available for this language pair.</source><target>F&#252;r diese Sprachkombination ist kein freigegebenes Glossar vorhanden.</target></trans-unit>
+            <trans-unit id="batch.styleRule"><source>Style rule</source><target>Stilregel</target></trans-unit>
+            <trans-unit id="batch.styleRule.none"><source>No style rule</source><target>Keine Stilregel</target></trans-unit>
+            <trans-unit id="batch.styleRule.help"><source>Only approved style rules for this target language are shown.</source><target>Es werden nur freigegebene Stilregeln f&#252;r diese Zielsprache angezeigt.</target></trans-unit>
+            <trans-unit id="batch.styleRule.empty"><source>No approved style rule is available for this target language.</source><target>F&#252;r diese Zielsprache ist keine freigegebene Stilregel vorhanden.</target></trans-unit>
+            <trans-unit id="batch.customInstructions"><source>Custom instructions</source><target>Custom Instructions</target></trans-unit>
+            <trans-unit id="batch.customInstructions.help"><source>Optional. One instruction per line, maximum ten instructions.</source><target>Optional. Eine Anweisung pro Zeile, maximal zehn Anweisungen.</target></trans-unit>
+            <trans-unit id="batch.checkbox.subtree"><source>Select this page recursively including all subpages.</source><target>Diese Seite rekursiv inklusive aller Unterseiten ausw&#228;hlen.</target></trans-unit>
+            <trans-unit id="batch.checkbox.pageOnly"><source>Select this page.</source><target>Diese Seite ausw&#228;hlen.</target></trans-unit>
+            <trans-unit id="batch.checkbox.elementOnly"><source>Select only this content element.</source><target>Nur dieses Inhaltselement ausw&#228;hlen.</target></trans-unit>
+            <trans-unit id="batch.checkbox.subtreeShort"><source>Recursive</source><target>Rekursiv</target></trans-unit>
+            <trans-unit id="batch.checkbox.pageOnlyShort"><source>Page</source><target>Seite</target></trans-unit>
+            <trans-unit id="batch.elementsInPage"><source>Content elements that can be processed.</source><target>Inhaltselemente, die verarbeitet werden k&#246;nnen.</target></trans-unit>
+            <trans-unit id="batch.noAccessElements"><source>Content elements without sufficient backend permissions.</source><target>Inhaltselemente ohne ausreichende Backend-Rechte.</target></trans-unit>
+            <trans-unit id="batch.noAccess"><source>No access</source><target>Kein Zugriff</target></trans-unit>
+            <trans-unit id="batch.noElements"><source>This page has no default-language content elements.</source><target>Diese Seite hat keine Inhaltselemente in der Standardsprache.</target></trans-unit>
+            <trans-unit id="batch.hidden"><source>Hidden</source><target>Verborgen</target></trans-unit>
+            <trans-unit id="batch.error.noBackendUser"><source>No backend user session was found.</source><target>Es wurde keine Backend-Benutzersitzung gefunden.</target></trans-unit>
+            <trans-unit id="batch.error.noSite"><source>No TYPO3 site configuration was found.</source><target>Es wurde keine TYPO3-Site-Konfiguration gefunden.</target></trans-unit>
+            <trans-unit id="batch.error.noLanguages"><source>Batch translation needs a default language and one target language.</source><target>Die Massen&#252;bersetzung braucht eine Standardsprache und eine Zielsprache.</target></trans-unit>
+            <trans-unit id="batch.error.invalidLanguageMapping"><source>Source and target language could not be mapped to different DeepL language codes.</source><target>Ausgangs- und Zielsprache konnten nicht auf unterschiedliche DeepL-Sprachcodes gemappt werden.</target></trans-unit>
+            <trans-unit id="batch.error.missingAuthKey"><source>DeepL V3 auth key is missing.</source><target>Der DeepL-V3-Auth-Key fehlt.</target></trans-unit>
+            <trans-unit id="batch.error.localizePage"><source>Could not localize page UID %s.</source><target>Seite UID %s konnte nicht lokalisiert werden.</target></trans-unit>
+            <trans-unit id="batch.error.localizeElement"><source>Could not localize content element UID %s.</source><target>Inhaltselement UID %s konnte nicht lokalisiert werden.</target></trans-unit>
+            <trans-unit id="batch.error.page"><source>Page UID %s: %s</source><target>Seite UID %s: %s</target></trans-unit>
+            <trans-unit id="batch.error.element"><source>Content element UID %s: %s</source><target>Inhaltselement UID %s: %s</target></trans-unit>
+            <trans-unit id="batch.warning.noSelection"><source>No page or content element was selected for batch translation.</source><target>Es wurde keine Seite und kein Inhaltselement f&#252;r die Massen&#252;bersetzung ausgew&#228;hlt.</target></trans-unit>
+            <trans-unit id="batch.warning.noSourceRecords"><source>No valid source records were found for the selected batch translation.</source><target>F&#252;r die ausgew&#228;hlte Massen&#252;bersetzung wurden keine g&#252;ltigen Ausgangsdatens&#228;tze gefunden.</target></trans-unit>
+            <trans-unit id="batch.result.success"><source>Batch translation finished: %d page(s), %d content element(s).</source><target>Massen&#252;bersetzung abgeschlossen: %d Seite(n), %d Inhaltselement(e).</target></trans-unit>
+            <trans-unit id="batch.result.blocked"><source>%d record(s) were skipped because the current backend user has no write access.</source><target>%d Datensatz/Datens&#228;tze wurden &#252;bersprungen, weil der aktuelle Backend-Benutzer keinen Schreibzugriff hat.</target></trans-unit>
+            <trans-unit id="batch.result.skipped"><source>%d already translated record(s) were skipped.</source><target>%d bereits &#252;bersetzte Datens&#228;tze wurden &#252;bersprungen.</target></trans-unit>
+        </body>
+    </file>
+</xliff>

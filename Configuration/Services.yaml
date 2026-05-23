@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Ppl\PplDeeplV3BatchTranslation\:
+    resource: '../Classes/*'
+
+  Ppl\PplDeeplV3BatchTranslation\Controller\:
+    resource: '../Classes/Controller/*'
+    public: true

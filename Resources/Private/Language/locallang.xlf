@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-05-22T00:00:00Z" product-name="ppl_deepl_v3_batch_translation">
+        <header/>
+        <body>
+            <trans-unit id="module.root.title"><source>PPL DeepL</source></trans-unit>
+            <trans-unit id="module.root.description"><source>PPL DeepL translations.</source></trans-unit>
+            <trans-unit id="module.batch.title"><source>PPL DeepL V3 Batch Translation</source></trans-unit>
+            <trans-unit id="module.batch.description"><source>Controlled DeepL V3 batch translation for page trees.</source></trans-unit>
+            <trans-unit id="batch.title"><source>PPL DeepL V3 Batch Translation</source></trans-unit>
+            <trans-unit id="batch.intro"><source>Inspect a page tree, content translation status and access limits before starting controlled batch translation.</source></trans-unit>
+            <trans-unit id="batch.phaseNoticeTitle"><source>Controlled translation</source></trans-unit>
+            <trans-unit id="batch.phaseNotice"><source>Selected pages and elements are localized through TYPO3 DataHandler before translated text fields are written.</source></trans-unit>
+            <trans-unit id="batch.rootPage"><source>Root page</source></trans-unit>
+            <trans-unit id="batch.targetLanguage"><source>Target language</source></trans-unit>
+            <trans-unit id="batch.pages"><source>Pages</source></trans-unit>
+            <trans-unit id="batch.elements"><source>Elements</source></trans-unit>
+            <trans-unit id="batch.blocked"><source>No access</source></trans-unit>
+            <trans-unit id="batch.tree"><source>Page tree</source></trans-unit>
+            <trans-unit id="batch.treeHint"><source>Open pages to inspect contained elements.</source></trans-unit>
+            <trans-unit id="batch.emptyTree"><source>No pages were found below the site root.</source></trans-unit>
+            <trans-unit id="batch.targetLanguageMissingTitle"><source>No target language configured</source></trans-unit>
+            <trans-unit id="batch.targetLanguageMissing"><source>Add a second site language first. Batch translation needs an existing TYPO3 target language.</source></trans-unit>
+            <trans-unit id="batch.status.missing"><source>Not translated</source></trans-unit>
+            <trans-unit id="batch.status.partial"><source>Partially translated</source></trans-unit>
+            <trans-unit id="batch.status.translated"><source>Translated</source></trans-unit>
+            <trans-unit id="batch.action.translate"><source>Translate</source></trans-unit>
+            <trans-unit id="batch.action.retranslate"><source>Retranslate</source></trans-unit>
+            <trans-unit id="batch.action.translateMissing"><source>Translate missing</source></trans-unit>
+            <trans-unit id="batch.action.translateSelected"><source>Translate selected</source></trans-unit>
+            <trans-unit id="batch.action.translateSelectedMissing"><source>Translate selected missing records</source></trans-unit>
+            <trans-unit id="batch.action.refresh"><source>Update view</source></trans-unit>
+            <trans-unit id="batch.options"><source>Translation options</source></trans-unit>
+            <trans-unit id="batch.optionsHint"><source>These settings are used for the next batch run and for the current status view.</source></trans-unit>
+            <trans-unit id="batch.glossary"><source>Glossary</source></trans-unit>
+            <trans-unit id="batch.glossary.none"><source>No glossary</source></trans-unit>
+            <trans-unit id="batch.glossary.help"><source>Only approved glossaries for this language pair are shown.</source></trans-unit>
+            <trans-unit id="batch.glossary.empty"><source>No approved glossary is available for this language pair.</source></trans-unit>
+            <trans-unit id="batch.styleRule"><source>Style rule</source></trans-unit>
+            <trans-unit id="batch.styleRule.none"><source>No style rule</source></trans-unit>
+            <trans-unit id="batch.styleRule.help"><source>Only approved style rules for this target language are shown.</source></trans-unit>
+            <trans-unit id="batch.styleRule.empty"><source>No approved style rule is available for this target language.</source></trans-unit>
+            <trans-unit id="batch.customInstructions"><source>Custom instructions</source></trans-unit>
+            <trans-unit id="batch.customInstructions.help"><source>Optional. One instruction per line, maximum ten instructions.</source></trans-unit>
+            <trans-unit id="batch.checkbox.subtree"><source>Select this page recursively including all subpages.</source></trans-unit>
+            <trans-unit id="batch.checkbox.pageOnly"><source>Select this page.</source></trans-unit>
+            <trans-unit id="batch.checkbox.elementOnly"><source>Select only this content element.</source></trans-unit>
+            <trans-unit id="batch.checkbox.subtreeShort"><source>Recursive</source></trans-unit>
+            <trans-unit id="batch.checkbox.pageOnlyShort"><source>Page</source></trans-unit>
+            <trans-unit id="batch.elementsInPage"><source>Content elements that can be processed.</source></trans-unit>
+            <trans-unit id="batch.noAccessElements"><source>Content elements without sufficient backend permissions.</source></trans-unit>
+            <trans-unit id="batch.noAccess"><source>No access</source></trans-unit>
+            <trans-unit id="batch.noElements"><source>This page has no default-language content elements.</source></trans-unit>
+            <trans-unit id="batch.hidden"><source>Hidden</source></trans-unit>
+            <trans-unit id="batch.error.noBackendUser"><source>No backend user session was found.</source></trans-unit>
+            <trans-unit id="batch.error.noSite"><source>No TYPO3 site configuration was found.</source></trans-unit>
+            <trans-unit id="batch.error.noLanguages"><source>Batch translation needs a default language and one target language.</source></trans-unit>
+            <trans-unit id="batch.error.invalidLanguageMapping"><source>Source and target language could not be mapped to different DeepL language codes.</source></trans-unit>
+            <trans-unit id="batch.error.missingAuthKey"><source>DeepL V3 auth key is missing.</source></trans-unit>
+            <trans-unit id="batch.error.localizePage"><source>Could not localize page UID %s.</source></trans-unit>
+            <trans-unit id="batch.error.localizeElement"><source>Could not localize content element UID %s.</source></trans-unit>
+            <trans-unit id="batch.error.page"><source>Page UID %s: %s</source></trans-unit>
+            <trans-unit id="batch.error.element"><source>Content element UID %s: %s</source></trans-unit>
+            <trans-unit id="batch.warning.noSelection"><source>No page or content element was selected for batch translation.</source></trans-unit>
+            <trans-unit id="batch.warning.noSourceRecords"><source>No valid source records were found for the selected batch translation.</source></trans-unit>
+            <trans-unit id="batch.result.success"><source>Batch translation finished: %d page(s), %d content element(s).</source></trans-unit>
+            <trans-unit id="batch.result.blocked"><source>%d record(s) were skipped because the current backend user has no write access.</source></trans-unit>
+            <trans-unit id="batch.result.skipped"><source>%d already translated record(s) were skipped.</source></trans-unit>
+        </body>
+    </file>
+</xliff>

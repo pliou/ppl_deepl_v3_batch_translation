@@ -1,0 +1,7 @@
+/.idea export-ignore
+/.Build export-ignore
+/vendor export-ignore
+/var export-ignore
+/public export-ignore
+/typo3temp export-ignore
+/composer.lock export-ignore

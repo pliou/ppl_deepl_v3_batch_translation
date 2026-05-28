@@ -10,3 +10,6 @@ services:
   Ppl\PplDeeplV3BatchTranslation\Controller\:
     resource: '../Classes/Controller/*'
     public: true
+
+  Ppl\PplDeeplV3BatchTranslation\Service\TranslationProviderInterface:
+    alias: Ppl\PplDeeplV3BatchTranslation\Service\Smoke\SmokeAwareTranslationProvider

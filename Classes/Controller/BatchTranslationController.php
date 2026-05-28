@@ -4,74 +4,136 @@ declare(strict_types=1);
 
 namespace Ppl\PplDeeplV3BatchTranslation\Controller;
 
-use Ppl\PplDeeplV3BatchTranslation\Service\BatchPageTreeService;
-use Ppl\PplDeeplV3BatchTranslation\Service\BatchTranslationOptionService;
-use Ppl\PplDeeplV3BatchTranslation\Service\BatchTranslationExecutionService;
+use Ppl\PplDeeplV3BatchTranslation\Service\BatchWorkspaceService;
+use Ppl\PplDeeplV3BatchTranslation\Service\BatchResultViewModelService;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 #[AsController]
 final class BatchTranslationController
 {
+    private const FORM_NAME = 'ppl_deepl_v3_batch_translation';
+    private const FORM_ACTION = 'workspace';
+
     public function __construct(
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
+        private readonly UriBuilder $uriBuilder,
         private readonly PageRenderer $pageRenderer,
-        private readonly BatchPageTreeService $batchPageTreeService,
-        private readonly BatchTranslationOptionService $batchTranslationOptionService,
-        private readonly BatchTranslationExecutionService $batchTranslationExecutionService
+        private readonly FormProtectionFactory $formProtectionFactory,
+        private readonly BatchWorkspaceService $workspaceService,
+        private readonly BatchResultViewModelService $resultViewModelService,
+        private readonly ResponseFactoryInterface $responseFactory
     ) {}
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $requestData = is_array($body) ? $body : $request->getQueryParams();
-        $selectedTargetLanguageId = $this->batchTranslationOptionService->resolveTargetLanguageId($requestData);
-        $messages = is_array($body) ? $this->batchTranslationExecutionService->execute($body) : [];
+        $body = is_array($body) ? $body : [];
+        $formProtection = $this->formProtectionFactory->createFromRequest($request);
+        $formToken = $formProtection->generateToken(self::FORM_NAME, self::FORM_ACTION);
+        $messages = [];
+        $action = (string)($body['module_action'] ?? '');
+        $normalizedAction = $this->normalizeAction($action);
+        $isJsonPreviewRequest = $this->isJsonPreviewRequest($request, $body, $normalizedAction);
+
+        if ($normalizedAction === 'export_result_log') {
+            $jobUid = max(0, (int)($body['result_job_uid'] ?? ($body['confirmed_job_uid'] ?? 0)));
+            $csv = $this->resultViewModelService->buildCsv($jobUid);
+            $response = $this->responseFactory->createResponse(200)
+                ->withHeader('Content-Type', 'text/csv; charset=utf-8')
+                ->withHeader('Content-Disposition', 'attachment; filename="ppl-batch-translation-result-' . $jobUid . '.csv"');
+            $response->getBody()->write($csv);
+
+            return $response;
+        }
+
+        if (in_array($normalizedAction, ['clear_selection', 'restart_scan', 'generate_preview', 'write_translations', 'retranslate_selected', 'discard_preview'], true)
+            && !$formProtection->validateToken((string)($body['form_token'] ?? ''), self::FORM_NAME, self::FORM_ACTION)
+        ) {
+            $body['module_action'] = '';
+            $messages[] = [
+                'type' => 'error',
+                'text' => 'The form token is invalid. Please reload the module and try again.',
+            ];
+        }
+
+        $viewData = $this->workspaceService->handle($body, $messages);
+
+        if ($isJsonPreviewRequest) {
+            $response = $this->responseFactory->createResponse(200)
+                ->withHeader('Content-Type', 'application/json; charset=utf-8');
+            $response->getBody()->write(json_encode([
+                'ok' => !$this->hasErrorMessage($viewData['messages'] ?? []),
+                'messages' => $viewData['messages'] ?? [],
+                'confirmedJobUid' => (int)($viewData['confirmedJobUid'] ?? 0),
+                'confirmedJobStatus' => (string)($viewData['confirmedJobStatus'] ?? ''),
+                'workspaceStage' => (string)($viewData['workspaceStage'] ?? ''),
+                'preflight' => $viewData['preflight'] ?? null,
+                'actionState' => $viewData['actionState'] ?? [],
+            ], JSON_THROW_ON_ERROR));
+
+            return $response;
+        }
 
         $this->pageRenderer->addCssFile('EXT:ppl_deepl_v3_batch_translation/Resources/Public/Css/backend.css');
         $this->pageRenderer->addJsFile('EXT:ppl_deepl_v3_batch_translation/Resources/Public/Javascript/backend-scroll.js', 'module', true, false, '', true);
 
-        $site = $this->batchTranslationOptionService->getPrimarySite();
-        $sourceLanguage = $site !== null ? $this->batchTranslationOptionService->getSourceLanguage($site) : null;
-        $targetLanguage = $site !== null ? $this->batchTranslationOptionService->getTargetLanguage($site, $selectedTargetLanguageId) : null;
-        $sourceLanguageCode = $sourceLanguage !== null ? $this->batchTranslationOptionService->toDeepLSourceLanguage($sourceLanguage) : '';
-        $targetLanguageCode = $targetLanguage !== null ? $this->batchTranslationOptionService->toDeepLTargetLanguage($targetLanguage) : '';
-        $selectedGlossaryId = $this->batchTranslationOptionService->resolveGlossaryId(
-            $sourceLanguageCode,
-            $targetLanguageCode,
-            (string)($requestData['glossary_id'] ?? '')
-        );
-        $selectedStyleRuleId = $this->batchTranslationOptionService->resolveStyleRuleId(
-            $targetLanguageCode,
-            (string)($requestData['style_rule_id'] ?? '')
-        );
-        $customInstructions = trim((string)($requestData['custom_instructions'] ?? ''));
-
         $moduleTemplate = $this->moduleTemplateFactory->create($request);
-        $moduleTemplate->setModuleClass('ppl-deepl-v3-batch-translation-module');
-        $moduleTemplate->setTitle(LocalizationUtility::translate('batch.title', 'PplDeeplV3BatchTranslation') ?? 'PPL DeepL V3 Batch Translation');
-        $moduleTemplate->assignMultiple($this->batchPageTreeService->buildTreeData($selectedTargetLanguageId) + [
-            'customInstructions' => $customInstructions,
-            'glossaryOptions' => $sourceLanguageCode !== '' && $targetLanguageCode !== ''
-                ? $this->batchTranslationOptionService->getGlossaryOptionsForLanguagePair($sourceLanguageCode, $targetLanguageCode)
-                : [],
-            'messages' => $messages,
-            'selectedGlossaryId' => $selectedGlossaryId,
-            'selectedStyleRuleId' => $selectedStyleRuleId,
-            'sourceLanguageCode' => $sourceLanguageCode,
-            'styleRuleOptions' => $targetLanguageCode !== ''
-                ? $this->batchTranslationOptionService->getStyleRuleOptionsForTargetLanguage($targetLanguageCode)
-                : [],
-            'targetLanguageCode' => $targetLanguageCode,
-            'targetLanguageOptions' => $site !== null
-                ? $this->batchTranslationOptionService->getTargetLanguageOptions($site, $selectedTargetLanguageId)
-                : [],
-        ]);
+        $moduleTemplate->setModuleClass('ppl-batch-translation-module');
+        $moduleTemplate->setTitle($this->translate('backend.title'));
+        $moduleTemplate->assignMultiple(array_merge($viewData, [
+            'route' => (string)$this->uriBuilder->buildUriFromRoute('ppl_deepl_v3_batch_translation'),
+            'formToken' => $formToken,
+        ]));
 
         return $moduleTemplate->renderResponse('BatchTranslation/Index');
+    }
+
+    private function translate(string $key): string
+    {
+        return LocalizationUtility::translate($key, 'PplDeeplV3BatchTranslation') ?? $key;
+    }
+
+    private function normalizeAction(string $action): string
+    {
+        if (str_starts_with($action, 'generate_preview:')) {
+            return 'generate_preview';
+        }
+        return match ($action) {
+            'preview' => 'generate_preview',
+            'execute' => 'write_translations',
+            default => $action,
+        };
+    }
+
+    private function isJsonPreviewRequest(ServerRequestInterface $request, array $body, string $normalizedAction): bool
+    {
+        if (!in_array($normalizedAction, ['generate_preview', 'retranslate_selected'], true)) {
+            return false;
+        }
+
+        return (string)($body['ajax_preview'] ?? '') === '1'
+            || strtolower($request->getHeaderLine('X-Requested-With')) === 'xmlhttprequest';
+    }
+
+    /**
+     * @param mixed[] $messages
+     */
+    private function hasErrorMessage(array $messages): bool
+    {
+        foreach ($messages as $message) {
+            if (is_array($message) && (string)($message['type'] ?? '') === 'error') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

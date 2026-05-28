@@ -1,158 +1,184 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-    <div class="ppl-batch">
+    <div class="ppl-batch" data-module="ppl-batch-translation">
         <div class="ppl-batch__head">
-            <span class="ppl-batch__head-icon" aria-hidden="true"></span>
-            <div>
-                <h1><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.title" /></h1>
-                <p><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.intro" /></p>
-            </div>
+            <h1><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:backend.title" /></h1>
+            <p><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:backend.intro" /></p>
         </div>
 
-        <f:if condition="{targetLanguageAvailable}">
-            <f:then>
-                <f:if condition="{messages}">
-                    <div class="ppl-batch__messages">
-                        <f:for each="{messages}" as="message">
-                            <div class="ppl-batch-message ppl-batch-message--{message.type}">
-                                {message.text}
-                            </div>
-                        </f:for>
-                    </div>
-                </f:if>
+        <f:for each="{messages}" as="message">
+            <div class="ppl-batch__message ppl-batch__message--{message.type}">{message.text}</div>
+        </f:for>
 
-                <div class="ppl-batch__note">
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.phaseNoticeTitle" /></strong>
-                    <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.phaseNotice" /></span>
-                </div>
+        <script type="application/json" data-role="batch-language-options"><f:format.raw>{languageOptionsJson}</f:format.raw></script>
+        <script type="application/json" data-role="batch-glossary-options"><f:format.raw>{glossaryOptionsByCombinationJson}</f:format.raw></script>
+        <script type="application/json" data-role="batch-style-rule-options"><f:format.raw>{styleRuleOptionsJson}</f:format.raw></script>
+        <script type="application/json" data-role="batch-style-rule-options-by-language"><f:format.raw>{styleRuleOptionsByLanguageJson}</f:format.raw></script>
 
-                <div class="ppl-batch__summary" aria-label="Batch summary">
-                    <div class="ppl-batch__metric">
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.rootPage" /></span>
-                        <strong>{rootPageId}</strong>
-                    </div>
-                    <div class="ppl-batch__metric">
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.targetLanguage" /></span>
-                        <strong>{targetLanguage.title} ({targetLanguage.id})</strong>
-                    </div>
-                    <div class="ppl-batch__metric">
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.pages" /></span>
-                        <strong>{totalPages}</strong>
-                    </div>
-                    <div class="ppl-batch__metric">
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.elements" /></span>
-                        <strong>{totalElements}</strong>
-                    </div>
-                    <div class="ppl-batch__metric ppl-batch__metric--danger">
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.blocked" /></span>
-                        <strong>{blockedElements}</strong>
-                    </div>
-                </div>
+        <form method="post" action="{route}" id="pplBatchTranslationForm" class="ppl-batch__form" data-has-preview="{f:if(condition: actionState.hasPreview, then: '1', else: '0')}" data-confirm-discard-preview="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:confirm.discardPreview')}" data-confirm-write="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:confirm.writeTranslations')}" data-confirm-retranslate="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:confirm.retranslate')}" data-label-source="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.sourceValue')}" data-label-current="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.currentValue')}" data-label-proposal="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.deeplProposal')}" data-label-placeholder="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.translationPlaceholder')}" data-label-missing="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.translationMissing')}" data-label-action-translate="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.operationWillWrite')}" data-label-action-fill_empty="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.operationFillEmpty')}" data-label-action-overwrite="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.operationOverwrite')}" data-label-loading="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.loadingPreview')}" data-label-ready="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.previewReady')}">
+            <input type="hidden" name="form_token" value="{formToken}">
+            <input type="hidden" name="active_page_uid" value="{formData.activePageUid}">
+            <input type="hidden" name="workspace_stage" value="{formData.workspaceStage}">
+            <input type="hidden" name="preview_scope_type" value="{formData.previewScopeType}">
+            <input type="hidden" name="preview_scope_uid" value="{formData.previewScopeUid}">
+            <f:if condition="{formData.resultJobUid}">
+                <input type="hidden" name="result_job_uid" value="{formData.resultJobUid}">
+            </f:if>
+            <f:if condition="{confirmedJobUid}">
+                <input type="hidden" name="confirmed_job_uid" value="{confirmedJobUid}">
+                <input type="hidden" name="confirmed_preview_job" value="{confirmedJobUid}">
+            </f:if>
 
-                <form class="ppl-batch__form" method="post">
-                    <section class="ppl-batch__options">
-                        <header class="ppl-batch__panel-head">
-                            <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.options" /></strong>
-                            <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.optionsHint" /></span>
-                            <button class="btn btn-default btn-sm ppl-batch__header-action" type="submit" name="batch_action" value="refresh">
-                                <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.action.refresh" />
-                            </button>
-                        </header>
-                        <div class="ppl-batch__options-grid">
-                            <label class="ppl-batch-field" for="batch_target_language_id">
-                                <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.targetLanguage" /></span>
-                                <select id="batch_target_language_id" name="target_language_id">
-                                    <f:for each="{targetLanguageOptions}" as="option">
-                                        <f:if condition="{option.selected}">
-                                            <f:then><option value="{option.id}" selected="selected">{option.title} ({option.code})</option></f:then>
-                                            <f:else><option value="{option.id}">{option.title} ({option.code})</option></f:else>
-                                        </f:if>
-                                    </f:for>
-                                </select>
-                            </label>
+            <section class="ppl-batch__workflow" aria-label="Batch translation workflow">
+                <f:for each="{workflowSteps}" as="step">
+                    <div class="ppl-batch__workflow-step ppl-batch__workflow-step--{step.state}">
+                        <span class="ppl-batch__workflow-number">{step.number}</span>
+                        <span>
+                            <strong><f:translate key="{step.labelKey}" /></strong>
+                            <small><f:translate key="{step.hintKey}" /></small>
+                        </span>
+                    </div>
+                </f:for>
+            </section>
 
-                            <label class="ppl-batch-field" for="batch_glossary_id">
-                                <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.glossary" /></span>
-                                <select id="batch_glossary_id" name="glossary_id">
-                                    <option value=""><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.glossary.none" /></option>
-                                    <f:for each="{glossaryOptions}" as="label" key="id">
-                                        <f:if condition="{selectedGlossaryId} == {id}">
-                                            <f:then><option value="{id}" selected="selected">{label}</option></f:then>
-                                            <f:else><option value="{id}">{label}</option></f:else>
-                                        </f:if>
-                                    </f:for>
-                                </select>
-                                <small>
-                                    <f:if condition="{glossaryOptions}">
-                                        <f:then><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.glossary.help" /></f:then>
-                                        <f:else><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.glossary.empty" /></f:else>
+            <section class="ppl-batch__site-summary">
+                <strong>{siteSummary.label}</strong>
+                <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:site.root" /> #{siteSummary.rootPageId} {siteSummary.rootTitle}</span>
+                <span>{siteSummary.pageCount} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:site.pagesInSite" /></span>
+                <small>{siteSummary.hint}</small>
+            </section>
+
+            <section class="ppl-batch__context">
+                <div class="ppl-batch__context-group ppl-batch__context-group--translation">
+                    <div class="ppl-batch__group-label"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:group.translationSettings" /></div>
+                    <div class="ppl-batch__translation-settings">
+                        <div class="ppl-batch__field">
+                            <label for="source_language_id"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.source" /></label>
+                            <select id="source_language_id" name="source_language_id" data-role="batch-source-language" data-preview-invalidates="1">
+                                <f:for each="{languageOptions}" as="language">
+                                    <f:if condition="{formData.sourceLanguageId} == {language.id}">
+                                        <f:then><option value="{language.id}" data-deepl-source="{language.deeplSource}" data-deepl-target="{language.deeplTarget}" selected="selected">{language.title} ({language.deeplSource})</option></f:then>
+                                        <f:else><option value="{language.id}" data-deepl-source="{language.deeplSource}" data-deepl-target="{language.deeplTarget}">{language.title} ({language.deeplSource})</option></f:else>
                                     </f:if>
-                                </small>
-                            </label>
-
-                            <label class="ppl-batch-field" for="batch_style_rule_id">
-                                <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.styleRule" /></span>
-                                <select id="batch_style_rule_id" name="style_rule_id">
-                                    <option value=""><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.styleRule.none" /></option>
-                                    <f:for each="{styleRuleOptions}" as="label" key="id">
-                                        <f:if condition="{selectedStyleRuleId} == {id}">
-                                            <f:then><option value="{id}" selected="selected">{label}</option></f:then>
-                                            <f:else><option value="{id}">{label}</option></f:else>
-                                        </f:if>
-                                    </f:for>
-                                </select>
-                                <small>
-                                    <f:if condition="{styleRuleOptions}">
-                                        <f:then><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.styleRule.help" /></f:then>
-                                        <f:else><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.styleRule.empty" /></f:else>
-                                    </f:if>
-                                </small>
-                            </label>
-
-                            <label class="ppl-batch-field" for="batch_custom_instructions">
-                                <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.customInstructions" /></span>
-                                <textarea id="batch_custom_instructions" name="custom_instructions" rows="2">{customInstructions}</textarea>
-                                <small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.customInstructions.help" /></small>
-                            </label>
-                        </div>
-                    </section>
-
-                    <section class="ppl-batch__panel">
-                    <header class="ppl-batch__panel-head">
-                        <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.tree" /></strong>
-                        <span><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.treeHint" /></span>
-                    </header>
-
-                    <div class="ppl-batch__tree">
-                        <f:if condition="{tree}">
-                            <f:then>
-                                <f:for each="{tree}" as="node">
-                                    <f:render partial="BatchTranslation/PageNode" arguments="{node: node}" />
                                 </f:for>
-                            </f:then>
-                            <f:else>
-                                <div class="ppl-batch__empty">
-                                    <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.emptyTree" />
-                                </div>
-                            </f:else>
-                        </f:if>
+                            </select>
+                        </div>
+                        <div class="ppl-batch__field">
+                            <label for="target_language_id"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.target" /></label>
+                            <select id="target_language_id" name="target_language_id" data-role="batch-target-language" data-preview-invalidates="1">
+                                <f:for each="{languageOptions}" as="language">
+                                    <f:if condition="{formData.targetLanguageId} == {language.id}">
+                                        <f:then><option value="{language.id}" data-deepl-source="{language.deeplSource}" data-deepl-target="{language.deeplTarget}" selected="selected">{language.title} ({language.deeplTarget})</option></f:then>
+                                        <f:else><option value="{language.id}" data-deepl-source="{language.deeplSource}" data-deepl-target="{language.deeplTarget}">{language.title} ({language.deeplTarget})</option></f:else>
+                                    </f:if>
+                                </f:for>
+                            </select>
+                        </div>
+                        <div class="ppl-batch__field">
+                            <label for="glossary_id"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.glossary" /></label>
+                            <select id="glossary_id" name="glossary_id" data-role="batch-glossary-select" data-empty-label="No glossary" data-unavailable-label="No approved glossary" data-preview-invalidates="1">
+                                <option value="">No glossary</option>
+                                <f:for each="{glossaryOptions}" as="label" key="id">
+                                    <f:if condition="{formData.glossaryId} == {id}">
+                                        <f:then><option value="{id}" selected="selected">{label}</option></f:then>
+                                        <f:else><option value="{id}">{label}</option></f:else>
+                                    </f:if>
+                                </f:for>
+                            </select>
+                        </div>
+                        <div class="ppl-batch__field">
+                            <label for="style_rule_id"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.styleRule" /></label>
+                            <select id="style_rule_id" name="style_rule_id" data-role="batch-style-rule-select" data-empty-label="No style rule" data-unavailable-label="No approved style rule" data-preview-invalidates="1">
+                                <option value="">No style rule</option>
+                                <f:for each="{styleRuleOptions}" as="label" key="id">
+                                    <f:if condition="{formData.styleRuleId} == {id}">
+                                        <f:then><option value="{id}" selected="selected">{label}</option></f:then>
+                                        <f:else><option value="{id}">{label}</option></f:else>
+                                    </f:if>
+                                </f:for>
+                            </select>
+                        </div>
+                        <div class="ppl-batch__field ppl-batch__field--instructions">
+                            <label for="custom_instructions"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.customInstructions" /></label>
+                            <textarea id="custom_instructions" name="custom_instructions" rows="1" data-preview-invalidates="1">{formData.customInstructions}</textarea>
+                        </div>
                     </div>
-                    <footer class="ppl-batch__panel-actions">
-                        <button class="btn btn-primary" type="submit" name="batch_action" value="translate_selected">
-                            <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.action.translateSelected" />
-                        </button>
-                        <button class="btn btn-default" type="submit" name="batch_action" value="translate_selected_missing">
-                            <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.action.translateSelectedMissing" />
-                        </button>
-                    </footer>
-                    </section>
-                </form>
-            </f:then>
-            <f:else>
-                <div class="ppl-batch__warning">
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.targetLanguageMissingTitle" /></strong>
-                    <p><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.targetLanguageMissing" /></p>
                 </div>
-            </f:else>
-        </f:if>
+
+                <div class="ppl-batch__context-group ppl-batch__context-group--batch">
+                    <div class="ppl-batch__group-label"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:group.batchControls" /></div>
+                    <div class="ppl-batch__batch-controls">
+                        <div class="ppl-batch__field">
+                            <label for="site_identifier"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:field.site" /></label>
+                            <select id="site_identifier" name="site_identifier" data-preview-invalidates="1">
+                                <f:for each="{siteOptions}" as="site">
+                                    <f:if condition="{formData.siteIdentifier} == {site.identifier}">
+                                        <f:then><option value="{site.identifier}" selected="selected">{site.label}</option></f:then>
+                                        <f:else><option value="{site.identifier}">{site.label}</option></f:else>
+                                    </f:if>
+                                </f:for>
+                            </select>
+                        </div>
+                        <div class="ppl-batch__context-actions">
+                            <f:if condition="{formData.scanAction} == 'scan'">
+                                <f:then><button class="btn btn-primary" type="submit" name="module_action" value="scan"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.scan" /></button></f:then>
+                                <f:else><button class="btn btn-primary" type="submit" name="module_action" value="restart_scan" data-discards-preview="{f:if(condition: actionState.hasPreview, then: '1', else: '0')}"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.restartScan" /></button></f:else>
+                            </f:if>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <f:if condition="{showEmptyWorkspace}">
+                <f:then>
+                    <section class="ppl-batch__workspace ppl-batch__workspace--select">
+                        <main class="ppl-batch__panel ppl-batch__panel--empty">
+                            <div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:empty.beforeScan" /></div>
+                        </main>
+                        <f:render partial="BatchTranslation/SelectionBasket" arguments="{_all}" />
+                    </section>
+                </f:then>
+                <f:else>
+                    <f:if condition="{showTreeWorkspace}">
+                        <f:then>
+                            <section class="ppl-batch__workspace ppl-batch__workspace--select">
+                                <f:render partial="BatchTranslation/PageTree" arguments="{_all}" />
+                                <f:render partial="BatchTranslation/SelectionBasket" arguments="{_all}" />
+                            </section>
+                        </f:then>
+                        <f:else>
+                            <f:if condition="{showPagePreview}">
+                                <f:then>
+                                    <section class="ppl-batch__workspace ppl-batch__workspace--review">
+                                        <f:render partial="BatchTranslation/PagePreview" arguments="{_all}" />
+                                        <f:render partial="BatchTranslation/SelectionBasket" arguments="{_all}" />
+                                    </section>
+                                </f:then>
+                                <f:else>
+                                    <f:if condition="{showResults}">
+                                        <f:then>
+                                            <section class="ppl-batch__workspace ppl-batch__workspace--review">
+                                                <f:render partial="BatchTranslation/ResultView" arguments="{_all}" />
+                                                <f:render partial="BatchTranslation/SelectionBasket" arguments="{_all}" />
+                                            </section>
+                                        </f:then>
+                                        <f:else>
+                                            <section class="ppl-batch__workspace ppl-batch__workspace--review">
+                                                <f:render partial="BatchTranslation/SelectionReview" arguments="{_all}" />
+                                                <f:render partial="BatchTranslation/SelectionBasket" arguments="{_all}" />
+                                            </section>
+                                        </f:else>
+                                    </f:if>
+                                </f:else>
+                            </f:if>
+                        </f:else>
+                    </f:if>
+                </f:else>
+            </f:if>
+
+            <f:if condition="{showResults}">
+                <f:then></f:then>
+                <f:else><f:render partial="BatchTranslation/PreflightSummary" arguments="{_all}" /></f:else>
+            </f:if>
+        </form>
     </div>
 </html>

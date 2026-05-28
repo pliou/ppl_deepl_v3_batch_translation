@@ -1,0 +1,81 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <main class="ppl-batch__panel ppl-batch__panel--detail">
+        <div class="ppl-batch__panel-head">
+            <f:if condition="{pageDetails.page}">
+                <f:then>
+                    <strong>{pageDetails.page.title} #{pageDetails.page.uid}</strong>
+                    <span class="ppl-batch__badge ppl-batch__badge--{pageDetails.page.status}">{pageDetails.page.status}</span>
+                </f:then>
+                <f:else><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.selectedPage" /></strong></f:else>
+            </f:if>
+        </div>
+
+        <f:if condition="{pageDetails.page}">
+            <f:then>
+                <f:if condition="{pageDetails.page.blockReasons}">
+                    <div class="ppl-batch__warning">
+                        <f:for each="{pageDetails.page.blockReasons}" as="reason">{reason}<br></f:for>
+                    </div>
+                </f:if>
+                <section class="ppl-batch__detail-summary">
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.hierarchy" /></strong>{pageDetails.page.hierarchy}</span>
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.targetRecord" /></strong>{pageDetails.page.targetState}</span>
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></strong>{pageDetails.page.elementCount} total, {pageDetails.page.selectableElementCount} selectable, {pageDetails.page.blockedElementCount} blocked</span>
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.permission" /></strong>{pageDetails.page.permissionSummary}</span>
+                </section>
+                <section class="ppl-batch__detail-section">
+                    <div class="ppl-batch__section-title"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pageFields" /></div>
+                    <div class="ppl-batch__field-list">
+                        <f:for each="{pageDetails.pageFields}" as="field">
+                            <div class="ppl-batch__field-row">
+                                <span>{field.label}</span>
+                                <span class="ppl-batch__badge ppl-batch__badge--{field.status}">{field.status}</span>
+                                <small>{field.sourcePreview}</small>
+                            </div>
+                        </f:for>
+                        <f:if condition="{pageDetails.pageFields}">
+                            <f:else><div class="ppl-batch__empty">No configured page fields contain source text.</div></f:else>
+                        </f:if>
+                    </div>
+                </section>
+
+                <section class="ppl-batch__detail-section">
+                    <div class="ppl-batch__section-title"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.contentElements" /></div>
+                    <div class="ppl-batch__element-list">
+                        <f:for each="{pageDetails.elements}" as="element">
+                            <label class="ppl-batch__element-row {f:if(condition: element.blocked, then: 'ppl-batch__element-row--blocked')} {f:if(condition: element.excluded, then: 'ppl-batch__element-row--excluded')}">
+                                <f:if condition="{element.blocked}">
+                                    <f:then><input type="checkbox" name="selected_elements[]" value="{element.uid}:{element.pid}" data-selection-label="{pageDetails.page.hierarchy}-{element.hierarchy} #{element.uid} {element.title}" data-selection-scope="Element only" data-selection-meta="Page #{pageDetails.page.uid}" disabled="disabled"></f:then>
+                                    <f:else>
+                                        <f:if condition="{element.selected}">
+                                            <f:then><input type="checkbox" name="selected_elements[]" value="{element.uid}:{element.pid}" data-selection-label="{pageDetails.page.hierarchy}-{element.hierarchy} #{element.uid} {element.title}" data-selection-scope="Element only" data-selection-meta="Page #{pageDetails.page.uid}" checked="checked"></f:then>
+                                            <f:else><input type="checkbox" name="selected_elements[]" value="{element.uid}:{element.pid}" data-selection-label="{pageDetails.page.hierarchy}-{element.hierarchy} #{element.uid} {element.title}" data-selection-scope="Element only" data-selection-meta="Page #{pageDetails.page.uid}"></f:else>
+                                        </f:if>
+                                    </f:else>
+                                </f:if>
+                                <span class="ppl-batch__element-scope"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:scope.elementOnly" /></span>
+                                <span class="ppl-batch__element-outline">{pageDetails.page.hierarchy}-{element.hierarchy}</span>
+                                <span class="ppl-batch__element-title" title="{element.fullTitle}">#{element.uid} {element.title}</span>
+                                <span class="ppl-batch__element-meta">{element.ctype} / col {element.colPos}</span>
+                                <span class="ppl-batch__badge ppl-batch__badge--{element.status}">{element.status}</span>
+                                <small class="ppl-batch__element-permission">{element.permissionSummary}</small>
+                                <small class="ppl-batch__element-preview">{element.preview}</small>
+                                <f:if condition="{element.blockReasons}">
+                                    <small class="ppl-batch__element-reasons">
+                                        <f:for each="{element.blockReasons}" as="reason">{reason}<br></f:for>
+                                    </small>
+                                </f:if>
+                            </label>
+                        </f:for>
+                        <f:if condition="{pageDetails.elements}">
+                            <f:else><div class="ppl-batch__empty">No default-language content elements found on this page.</div></f:else>
+                        </f:if>
+                    </div>
+                </section>
+            </f:then>
+            <f:else>
+                <div class="ppl-batch__empty">Choose a page from the tree to inspect fields and elements.</div>
+            </f:else>
+        </f:if>
+    </main>
+</html>

@@ -1,5 +1,11 @@
 # PPL DeepL V3 Batch Translation
 
-TYPO3 backend module for the future controlled DeepL V3 batch translation workflow.
+TYPO3 backend workspace for controlled batch translation of `pages` and `tt_content` records through `ppl_deepl_v3_requests`.
 
-The package currently provides the backend menu point, route and controller placeholder.
+## Important UI Contracts
+
+Before changing the workspace UI, read:
+
+- [Batch Translation UX Regression Notes](Documentation/ux-regression-notes.md)
+
+That file documents decisions that should not be silently reverted, including selection preset placement, existing translation display, preview/write separation, visibility handling, and localized slug regeneration.

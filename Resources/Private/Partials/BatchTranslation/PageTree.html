@@ -1,0 +1,54 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <aside class="ppl-batch__panel ppl-batch__panel--tree">
+        <div class="ppl-batch__panel-head">
+            <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pageTree" /></strong>
+            <span class="ppl-batch__counter">{tree -> f:count()} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:tree.rows" /></span>
+        </div>
+        <div class="ppl-batch__filters">
+            <input type="search" name="tree_search" value="{formData.treeSearch}" placeholder="Search title or UID" data-role="tree-search">
+            <select name="tree_status_filter" data-role="tree-status-filter">
+                <f:for each="{statusFilters}" as="label" key="value">
+                    <f:if condition="{formData.treeStatusFilter} == {value}">
+                        <f:then><option value="{value}" selected="selected">{label}</option></f:then>
+                        <f:else><option value="{value}">{label}</option></f:else>
+                    </f:if>
+                </f:for>
+            </select>
+        </div>
+        <div class="ppl-batch__legend">
+            <span><i class="ppl-batch__legend-check ppl-batch__legend-check--recursive"></i><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:legend.recursive" /></span>
+            <span><i class="ppl-batch__legend-check ppl-batch__legend-check--page"></i><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:legend.onlyPage" /></span>
+            <span><i class="ppl-batch__legend-dot ppl-batch__legend-dot--element"></i><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:legend.elementOnly" /></span>
+            <span><i class="ppl-batch__legend-dot ppl-batch__legend-dot--blocked"></i><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:legend.blocked" /></span>
+        </div>
+        <div class="ppl-batch__tree" data-role="page-tree">
+            <f:for each="{tree}" as="page">
+                <div class="ppl-batch__tree-row {f:if(condition: page.selected, then: 'ppl-batch__tree-row--selected')} {f:if(condition: page.excluded, then: 'ppl-batch__tree-row--excluded')}" data-title="{page.title}" data-uid="{page.uid}" data-status="{page.status}" data-selected="{f:if(condition: page.selected, then: '1', else: '0')}" data-has-content="{f:if(condition: page.contentCount, then: '1', else: '0')}" style="--depth:{page.depth}">
+                    <label class="ppl-batch__scope-check ppl-batch__scope-check--recursive" title="Translate this page, child pages and their content elements recursively.">
+                        <f:if condition="{page.selectedSubtree}">
+                            <f:then><input type="checkbox" name="selected_subtree_pages[]" value="{page.uid}" data-selection-label="{page.hierarchy} #{page.uid} {page.title}" data-selection-scope="Recursive branch" data-selection-meta="{page.branchPageCount} pages, {page.branchContentCount} content elements" checked="checked"></f:then>
+                            <f:else><input type="checkbox" name="selected_subtree_pages[]" value="{page.uid}" data-selection-label="{page.hierarchy} #{page.uid} {page.title}" data-selection-scope="Recursive branch" data-selection-meta="{page.branchPageCount} pages, {page.branchContentCount} content elements"></f:else>
+                        </f:if>
+                        <span class="ppl-batch__sr-only"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:scope.recursiveBranch" /></span>
+                    </label>
+                    <label class="ppl-batch__scope-check ppl-batch__scope-check--page" title="Translate this page record and its content elements, but not child pages.">
+                        <f:if condition="{page.selectedPage}">
+                            <f:then><input type="checkbox" name="selected_pages[]" value="{page.uid}" data-selection-label="{page.hierarchy} #{page.uid} {page.title}" data-selection-scope="Only this page" data-selection-meta="1 page, {page.contentCount} content elements" checked="checked"></f:then>
+                            <f:else><input type="checkbox" name="selected_pages[]" value="{page.uid}" data-selection-label="{page.hierarchy} #{page.uid} {page.title}" data-selection-scope="Only this page" data-selection-meta="1 page, {page.contentCount} content elements"></f:else>
+                        </f:if>
+                        <span class="ppl-batch__sr-only"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:scope.onlyThisPage" /></span>
+                    </label>
+                    <span class="ppl-batch__tree-outline">{page.hierarchy}</span>
+                    <span class="ppl-batch__tree-title">#{page.uid} {page.title}</span>
+                    <span class="ppl-batch__badge ppl-batch__badge--{page.status}" title="{page.blockReasons.0}">{page.status}</span>
+                    <span class="ppl-batch__tree-meta">{page.contentCount} el / {page.targetContentCount} loc</span>
+                </div>
+            </f:for>
+            <f:if condition="{tree}">
+                <f:else>
+                    <div class="ppl-batch__empty">No pages found for this scan.</div>
+                </f:else>
+            </f:if>
+        </div>
+    </aside>
+</html>

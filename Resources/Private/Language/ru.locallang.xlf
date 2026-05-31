@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-05-25T00:00:00Z" product-name="ppl_deepl_v3_batch_translation" target-language="ru">
+        <header />
+        <body>
+            <trans-unit id="module.root.title">
+                <source>PPL DeepL V3</source>
+                <target>PPL DeepL V3</target>
+            </trans-unit>
+            <trans-unit id="module.root.description">
+                <source>PPL DeepL V3 translations.</source>
+                <target>PPL DeepL V3 переводы.</target>
+            </trans-unit>
+            <trans-unit id="module.batchTranslation.title">
+                <source>Batch Translation</source>
+                <target>Пакетный перевод</target>
+            </trans-unit>
+            <trans-unit id="module.batchTranslation.description">
+                <source>Translate TYPO3 pages and content elements in controlled batches.</source>
+                <target>Переведите страницы TYPO3 и элементы контента контролируемыми пакетами.</target>
+            </trans-unit>
+            <trans-unit id="backend.title">
+                <source>PPL DeepL V3 Batch Translation</source>
+                <target>PPL DeepL V3 Пакетная трансляция</target>
+            </trans-unit>
+            <trans-unit id="backend.intro">
+                <source>Scan a page tree, choose scope, review the resolved selection, generate DeepL suggestions, then write confirmed translations.</source>
+                <target>Просканируйте дерево страниц, выберите область действия, просмотрите решенный выбор, сгенерируйте предложения DeepL, а затем напишите подтвержденные переводы.</target>
+            </trans-unit>
+            <trans-unit id="workflow.scope">
+                <source>Scope</source>
+                <target>Область применения</target>
+            </trans-unit>
+            <trans-unit id="workflow.scope.hint">
+                <source>Choose site and languages.</source>
+                <target>Выберите сайт и языки.</target>
+            </trans-unit>
+            <trans-unit id="workflow.scan">
+                <source>Scan</source>
+                <target>Сканировать</target>
+            </trans-unit>
+            <trans-unit id="workflow.scan.hint">
+                <source>Read page tree and status. No writes.</source>
+                <target>Чтение дерева страниц и статуса. Нет пишет.</target>
+            </trans-unit>
+            <trans-unit id="workflow.select">
+                <source>Select</source>
+                <target>Выбрать</target>
+            </trans-unit>
+            <trans-unit id="workflow.select.hint">
+                <source>Build pages, branches and elements.</source>
+                <target>Создавайте страницы, ветки и элементы.</target>
+            </trans-unit>
+            <trans-unit id="workflow.review">
+                <source>Review selection</source>
+                <target>Обзор выбора</target>
+            </trans-unit>
+            <trans-unit id="workflow.review.hint">
+                <source>Inspect direct, inherited and excluded items.</source>
+                <target>Проверьте прямые, унаследованные и исключенные элементы.</target>
+            </trans-unit>
+            
+            
+            
+            
+            
+            
+            <trans-unit id="workflow.translationPreview">
+                <source>Translation preview</source>
+                <target>Предварительный просмотр перевода</target>
+            </trans-unit>
+            <trans-unit id="workflow.translationPreview.hint">
+                <source>Generate cached DeepL suggestions. No writes.</source>
+                <target>Генерировать кэшированные предложения DeepL. Нет пишет.</target>
+            </trans-unit>
+            <trans-unit id="workflow.write">
+                <source>Write</source>
+                <target>Написать</target>
+            </trans-unit>
+            <trans-unit id="workflow.write.hint">
+                <source>Write confirmed preview via DataHandler.</source>
+                <target>Напишите подтверждение предварительного просмотра через DataHandler.</target>
+            </trans-unit>
+            <trans-unit id="workflow.results">
+                <source>Results</source>
+                <target>Результаты</target>
+            </trans-unit>
+            <trans-unit id="workflow.results.hint">
+                <source>Review execution counters and errors.</source>
+                <target>Просмотрите счетчики выполнения и ошибки.</target>
+            </trans-unit>
+            <trans-unit id="site.root">
+                <source>Root page</source>
+                <target>Корневая страница</target>
+            </trans-unit>
+            <trans-unit id="site.pagesInSite">
+                <source>pages in site</source>
+                <target>страницы на сайте</target>
+            </trans-unit>
+            <trans-unit id="field.site">
+                <source>Site</source>
+                <target>Сайт</target>
+            </trans-unit>
+            <trans-unit id="field.source">
+                <source>Source</source>
+                <target>Источник</target>
+            </trans-unit>
+            <trans-unit id="field.target">
+                <source>Target</source>
+                <target>Цель</target>
+            </trans-unit>
+            <trans-unit id="field.mode">
+                <source>Selection preset</source>
+                <target>Предустановка выбора</target>
+            </trans-unit>
+            <trans-unit id="mode.selectionHint">
+                <source>Select only not translated skips existing translations. Select everything previews every selected writable field.</source>
+                <target>Выбрать только непереведенные — пропускает существующие переводы. Выбрать все — предварительный просмотр каждого выбранного поля, доступного для записи.</target>
+            </trans-unit>
+            <trans-unit id="field.glossary">
+                <source>Glossary</source>
+                <target>Глоссарий</target>
+            </trans-unit>
+            <trans-unit id="field.styleRule">
+                <source>Style rule</source>
+                <target>Правило стиля</target>
+            </trans-unit>
+            <trans-unit id="field.customInstructions">
+                <source>Custom instructions</source>
+                <target>Пользовательские инструкции</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="action.scan">
+                <source>Scan</source>
+                <target>Сканировать</target>
+            </trans-unit>
+            <trans-unit id="action.restartScan">
+                <source>Rescan</source>
+                <target>Повторное сканирование</target>
+            </trans-unit>
+            <trans-unit id="action.reviewSelection">
+                <source>Review selected items</source>
+                <target>Посмотреть выбранные элементы</target>
+            </trans-unit>
+            <trans-unit id="action.backToTree">
+                <source>Back to tree</source>
+                <target>Вернуться к дереву</target>
+            </trans-unit>
+            
+            <trans-unit id="action.previewBatch">
+                <source>Generate DeepL preview</source>
+                <target>Создать предварительный просмотр DeepL</target>
+            </trans-unit>
+            <trans-unit id="action.previewPage">
+                <source>Generate DeepL preview for this page</source>
+                <target>Создать предварительный просмотр DeepL для этой страницы</target>
+            </trans-unit>
+            <trans-unit id="action.previewElement">
+                <source>Generate DeepL preview for this element</source>
+                <target>Создать предварительный просмотр DeepL для этого элемента.</target>
+            </trans-unit>
+            <trans-unit id="action.repreviewPage">
+                <source>Generate retranslation preview for this page</source>
+                <target>Создать предварительный просмотр повторного перевода для этой страницы</target>
+            </trans-unit>
+            <trans-unit id="action.repreviewElement">
+                <source>Generate retranslation preview for this element</source>
+                <target>Создать предварительный просмотр повторного перевода для этого элемента</target>
+            </trans-unit>
+            <trans-unit id="action.execute">
+                <source>Write confirmed translations</source>
+                <target>Пишите подтвержденные переводы</target>
+            </trans-unit>
+            <trans-unit id="action.retranslateSelected">
+                <source>Regenerate DeepL preview</source>
+                <target>Восстановить предварительный просмотр DeepL</target>
+            </trans-unit>
+            <trans-unit id="action.discardPreview">
+                <source>Discard preview</source>
+                <target>Отменить предварительный просмотр</target>
+            </trans-unit>
+            <trans-unit id="action.clear">
+                <source>Clear selection</source>
+                <target>Очистить выбор</target>
+            </trans-unit>
+            <trans-unit id="action.pagePreview">
+                <source>Page preview</source>
+                <target>Предварительный просмотр страницы</target>
+            </trans-unit>
+            <trans-unit id="action.backToReview">
+                <source>Back to review selection</source>
+                <target>Вернуться к обзору выбора</target>
+            </trans-unit>
+            <trans-unit id="action.exportResultLog">
+                <source>Export result log</source>
+                <target>Экспортировать журнал результатов</target>
+            </trans-unit>
+            
+            <trans-unit id="action.openTranslatedPagePreview">
+                <source>Open translated page preview</source>
+                <target>Открыть предварительный просмотр переведенной страницы</target>
+            </trans-unit>
+            <trans-unit id="action.openTargetRecord">
+                <source>Open target record</source>
+                <target>Открыть целевую запись</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="scope.elementOnly">
+                <source>Element only</source>
+                <target>Только элемент</target>
+            </trans-unit>
+            <trans-unit id="legend.recursive">
+                <source>Branch = this page, child pages and selectable content elements</source>
+                <target>Ветка = эта страница, дочерние страницы и выбираемые элементы контента.</target>
+            </trans-unit>
+            <trans-unit id="legend.onlyPage">
+                <source>Page = this page and selectable content elements, no child pages</source>
+                <target>Страница = эта страница и выбираемые элементы контента, без дочерних страниц.</target>
+            </trans-unit>
+            <trans-unit id="legend.elementOnly">
+                <source>Element only = selected content element only</source>
+                <target>Только элемент = только выбранный элемент контента</target>
+            </trans-unit>
+            <trans-unit id="legend.blocked">
+                <source>Blocked = skipped with reason before execution</source>
+                <target>Заблокировано = пропущено по причине перед выполнением</target>
+            </trans-unit>
+            <trans-unit id="panel.pageTree">
+                <source>Page tree</source>
+                <target>Дерево страниц</target>
+            </trans-unit>
+            <trans-unit id="panel.selectedPage">
+                <source>Selected page</source>
+                <target>Выбранная страница</target>
+            </trans-unit>
+            <trans-unit id="panel.pageFields">
+                <source>Page fields</source>
+                <target>Поля страницы</target>
+            </trans-unit>
+            <trans-unit id="panel.contentElements">
+                <source>Content elements</source>
+                <target>Элементы контента</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="panel.reviewSelection">
+                <source>Review selection</source>
+                <target>Обзор выбора</target>
+            </trans-unit>
+            <trans-unit id="panel.preflightPreview">
+                <source>Live plan / Translation preview</source>
+                <target>Действующий план/Предварительный просмотр перевода</target>
+            </trans-unit>
+            <trans-unit id="panel.pagePreview">
+                <source>Page preview</source>
+                <target>Предварительный просмотр страницы</target>
+            </trans-unit>
+            <trans-unit id="label.hierarchy">
+                <source>Hierarchy</source>
+                <target>Иерархия</target>
+            </trans-unit>
+            <trans-unit id="label.targetRecord">
+                <source>Target record</source>
+                <target>Целевая запись</target>
+            </trans-unit>
+            <trans-unit id="label.elements">
+                <source>elements</source>
+                <target>элементы</target>
+            </trans-unit>
+            <trans-unit id="label.permission">
+                <source>Permission</source>
+                <target>Разрешение</target>
+            </trans-unit>
+            
+            <trans-unit id="label.inheritedVia">
+                <source>Inherited via</source>
+                <target>Унаследовано через</target>
+            </trans-unit>
+            
+            
+            
+            
+            <trans-unit id="label.liveSelectionSummary">
+                <source>Live selection summary</source>
+                <target>Сводка живого выбора</target>
+            </trans-unit>
+            <trans-unit id="label.liveSelectionEmpty">
+                <source>Choose a recursive branch, only this page or individual elements to resolve records and fields.</source>
+                <target>Выберите рекурсивную ветвь, только эту страницу или отдельные элементы для разрешения записей и полей.</target>
+            </trans-unit>
+            <trans-unit id="label.selectedPages">
+                <source>selected pages</source>
+                <target>выбранные страницы</target>
+            </trans-unit>
+            <trans-unit id="label.branches">
+                <source>branches</source>
+                <target>филиалы</target>
+            </trans-unit>
+            <trans-unit id="label.blocked">
+                <source>blocked</source>
+                <target>заблокирован</target>
+            </trans-unit>
+            <trans-unit id="label.create">
+                <source>create</source>
+                <target>создавать</target>
+            </trans-unit>
+            <trans-unit id="label.fields">
+                <source>fields</source>
+                <target>поля</target>
+            </trans-unit>
+            <trans-unit id="label.selectedPagesTitle">
+                <source>Selected pages</source>
+                <target>Выбранные страницы</target>
+            </trans-unit>
+            <trans-unit id="label.selectedBranchesTitle">
+                <source>Selected recursive branches</source>
+                <target>Выбранные рекурсивные ветки</target>
+            </trans-unit>
+            <trans-unit id="label.selectedElementsTitle">
+                <source>Selected elements</source>
+                <target>Выбранные элементы</target>
+            </trans-unit>
+            <trans-unit id="label.noSelectionYet">
+                <source>No selection yet. Choose a recursive branch, only this page or individual elements.</source>
+                <target>Выбора пока нет. Выберите рекурсивную ветку, только эту страницу или отдельные элементы.</target>
+            </trans-unit>
+            <trans-unit id="label.noResolvedSelection">
+                <source>No resolved selection yet. Go back to the tree and choose a recursive branch, only this page or individual elements.</source>
+                <target>Решенного выбора пока нет. Вернитесь к дереву и выберите рекурсивную ветвь, только эту страницу или отдельные элементы.</target>
+            </trans-unit>
+            <trans-unit id="label.excludedPages">
+                <source>Excluded pages</source>
+                <target>Исключенные страницы</target>
+            </trans-unit>
+            <trans-unit id="label.excludedElements">
+                <source>Excluded elements</source>
+                <target>Исключенные элементы</target>
+            </trans-unit>
+            <trans-unit id="label.excluded">
+                <source>Excluded</source>
+                <target>Исключено</target>
+            </trans-unit>
+            <trans-unit id="label.removedFromRecursiveSelection">
+                <source>Removed from recursive selection.</source>
+                <target>Удален из рекурсивного выбора.</target>
+            </trans-unit>
+            <trans-unit id="label.resolvedPages">
+                <source>pages in resolved order</source>
+                <target>страницы в разрешенном порядке</target>
+            </trans-unit>
+            <trans-unit id="label.contentElements">
+                <source>content elements</source>
+                <target>элементы контента</target>
+            </trans-unit>
+            <trans-unit id="label.willCreate">
+                <source>Will create</source>
+                <target>создаст</target>
+            </trans-unit>
+            <trans-unit id="label.willUpdate">
+                <source>Will update</source>
+                <target>Обновлю</target>
+            </trans-unit>
+            <trans-unit id="label.willSkip">
+                <source>Will skip</source>
+                <target>Пропущу</target>
+            </trans-unit>
+            <trans-unit id="label.estimatedCharacters">
+                <source>Estimated DeepL characters</source>
+                <target>Примерное количество символов DeepL</target>
+            </trans-unit>
+            
+            <trans-unit id="label.sourceValue">
+                <source>Source</source>
+                <target>Источник</target>
+            </trans-unit>
+            <trans-unit id="label.currentValue">
+                <source>Existing translation</source>
+                <target>Существующий перевод</target>
+            </trans-unit>
+            <trans-unit id="label.deeplProposal">
+                <source>DeepL suggestion</source>
+                <target>DeepL предложение</target>
+            </trans-unit>
+            <trans-unit id="label.translationPlaceholder">
+                <source>Translation will appear here.</source>
+                <target>Здесь появится перевод.</target>
+            </trans-unit>
+            <trans-unit id="label.translationMissing">
+                <source>No existing translation yet.</source>
+                <target>Существующего перевода пока нет.</target>
+            </trans-unit>
+            <trans-unit id="label.noPendingTranslation">
+                <source>No pending translation</source>
+                <target>Нет ожидающего перевода</target>
+            </trans-unit>
+            <trans-unit id="label.operationWillWrite">
+                <source>will write</source>
+                <target>напишу</target>
+            </trans-unit>
+            <trans-unit id="label.operationFillEmpty">
+                <source>fills empty field</source>
+                <target>заполняет пустое поле</target>
+            </trans-unit>
+            <trans-unit id="label.operationOverwrite">
+                <source>will overwrite</source>
+                <target>перезапишет</target>
+            </trans-unit>
+            <trans-unit id="label.loadingPreview">
+                <source>Generating DeepL preview...</source>
+                <target>Создание предварительного просмотра DeepL...</target>
+            </trans-unit>
+            <trans-unit id="label.previewReady">
+                <source>DeepL preview ready.</source>
+                <target>Предварительный просмотр DeepL готов.</target>
+            </trans-unit>
+            <trans-unit id="visibility.title">
+                <source>Visibility after write</source>
+                <target>Видимость после записи</target>
+            </trans-unit>
+            <trans-unit id="visibility.hint">
+                <source>On publishes written target records. Off keeps them hidden after DataHandler writes.</source>
+                <target>На публикует письменные целевые записи. Off сохраняет их скрытыми после записи DataHandler.</target>
+            </trans-unit>
+            <trans-unit id="visibility.on">
+                <source>On</source>
+                <target>Вкл.</target>
+            </trans-unit>
+            <trans-unit id="visibility.off">
+                <source>Off</source>
+                <target>Выкл.</target>
+            </trans-unit>
+            <trans-unit id="label.noConfiguredPageFields">
+                <source>No configured page fields contain source text.</source>
+                <target>Ни одно настроенное поле страницы не содержит исходного текста.</target>
+            </trans-unit>
+            <trans-unit id="label.selectPageForPreview">
+                <source>Select a page in review to inspect its preview.</source>
+                <target>Выберите страницу, находящуюся на рассмотрении, чтобы просмотреть ее предварительный просмотр.</target>
+            </trans-unit>
+            <trans-unit id="result.created">
+                <source>created</source>
+                <target>создано</target>
+            </trans-unit>
+            <trans-unit id="result.updated">
+                <source>updated</source>
+                <target>обновлено</target>
+            </trans-unit>
+            <trans-unit id="result.writtenFields">
+                <source>written fields</source>
+                <target>письменные поля</target>
+            </trans-unit>
+            <trans-unit id="result.skipped">
+                <source>skipped</source>
+                <target>пропущен</target>
+            </trans-unit>
+            <trans-unit id="result.blocked">
+                <source>blocked</source>
+                <target>заблокирован</target>
+            </trans-unit>
+            <trans-unit id="result.failed">
+                <source>failed</source>
+                <target>не удалось</target>
+            </trans-unit>
+            <trans-unit id="confirm.discardPreview">
+                <source>You have unapplied translation previews. This action will discard them. Continue?</source>
+                <target>У вас есть неиспользованные предварительные просмотры перевода. Это действие приведет к их отмене. Продолжать?</target>
+            </trans-unit>
+            <trans-unit id="confirm.writeTranslations">
+                <source>Write the confirmed translation preview into TYPO3 now?</source>
+                <target>Записать подтвержденный предварительный просмотр перевода в TYPO3 прямо сейчас?</target>
+            </trans-unit>
+            <trans-unit id="confirm.retranslate">
+                <source>Regenerate selected DeepL preview and replace cached suggestions. Continue?</source>
+                <target>Восстановить выбранный предварительный просмотр DeepL и заменить кэшированные предложения. Продолжать?</target>
+            </trans-unit>
+            <trans-unit id="message.scanComplete">
+                <source>Scan complete. Build a selection and review selected items.</source>
+                <target>Сканирование завершено. Создайте выборку и просмотрите выбранные элементы.</target>
+            </trans-unit>
+            <trans-unit id="message.scanRestarted">
+                <source>Scan restarted. Any unapplied translation preview was discarded.</source>
+                <target>Сканирование перезапущено. Любой непримененный предварительный просмотр перевода был удален.</target>
+            </trans-unit>
+            <trans-unit id="message.previewDiscarded">
+                <source>Translation preview was discarded.</source>
+                <target>Предварительный просмотр перевода был удален.</target>
+            </trans-unit>
+            <trans-unit id="message.previewNeedsSelection">
+                <source>Choose at least one page, branch or content element before generating a preview.</source>
+                <target>Прежде чем создавать предварительный просмотр, выберите хотя бы одну страницу, ветку или элемент контента.</target>
+            </trans-unit>
+            <trans-unit id="message.previewReady">
+                <source>DeepL translation preview ready as job #%d. Review it before writing.</source>
+                <target>Предварительный просмотр перевода DeepL готов как задание №%d. Просмотрите его, прежде чем писать.</target>
+            </trans-unit>
+            <trans-unit id="message.previewFailedWithJob">
+                <source>DeepL suggestion generation failed. Audit job #%d was recorded, but nothing is ready to write.</source>
+                <target>Не удалось создать предложение DeepL. Задание аудита #%d записано, но ничего не готово к записи.</target>
+            </trans-unit>
+            <trans-unit id="message.writeNeedsPreview">
+                <source>Write requires a confirmed translation preview job for the current selection.</source>
+                <target>Для записи требуется подтвержденное задание предварительного просмотра перевода для текущего выбора.</target>
+            </trans-unit>
+            <trans-unit id="message.invalidFormToken">
+                <source>The form token is invalid. Please reload the module and try again.</source>
+                <target>Токен формы недействителен. Пожалуйста, перезагрузите модуль и повторите попытку.</target>
+            </trans-unit>
+            <trans-unit id="message.jobAccessDenied">
+                <source>You may only access batch translation jobs that you created.</source>
+                <target>Вы можете получить доступ только к созданным вами пакетным заданиям на перевод.</target>
+            </trans-unit>
+            <trans-unit id="empty.beforeScan">
+                <source>Choose site and languages, then scan the page tree. Mode is controlled in the action panel.</source>
+                <target>Выберите сайт и языки, затем просмотрите дерево страниц. Режим управляется на панели действий.</target>
+            </trans-unit>
+            <trans-unit id="batch.result.title">
+                <source>Translation results</source>
+                <target>Результаты перевода</target>
+            </trans-unit>
+            <trans-unit id="batch.result.empty">
+                <source>No result rows were recorded for this job.</source>
+                <target>Для этого задания не было записано ни одной строки результатов.</target>
+            </trans-unit>
+            <trans-unit id="batch.result.writtenFields">
+                <source>Written fields</source>
+                <target>Записанные поля</target>
+            </trans-unit>
+            <trans-unit id="batch.result.errorCode">
+                <source>Error code</source>
+                <target>Код ошибки</target>
+            </trans-unit>
+            <trans-unit id="tree.rows">
+                <source>rows</source>
+                <target>ряды</target>
+            </trans-unit>
+            <trans-unit id="workflow.ariaLabel">
+                <source>Batch translation progress</source>
+                <target>Ход пакетного перевода</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.current">
+                <source>current step</source>
+                <target>текущий шаг</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.completed">
+                <source>completed</source>
+                <target>завершено</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.upcoming">
+                <source>upcoming</source>
+                <target>предстоящий</target>
+            </trans-unit>
+            <trans-unit id="workflow.stepAria">
+                <source>Step %d, %s, %s</source>
+                <target>Шаг %d, %s, %s</target>
+            </trans-unit>
+            <trans-unit id="site.contextBar">
+                <source>Batch translation context</source>
+                <target>Контекст пакетного перевода</target>
+            </trans-unit>
+            <trans-unit id="group.translationSetup">
+                <source>Translation setup</source>
+                <target>Настройка перевода</target>
+            </trans-unit>
+            <trans-unit id="action.changeSetup">
+                <source>Change</source>
+                <target>Изменить</target>
+            </trans-unit>
+            <trans-unit id="action.removeSelection">
+                <source>Remove selection</source>
+                <target>Удалить выделение</target>
+            </trans-unit>
+            <trans-unit id="action.removeExclusion">
+                <source>Remove exclusion</source>
+                <target>Удалить исключение</target>
+            </trans-unit>
+            <trans-unit id="action.startNewBatch">
+                <source>Start new batch</source>
+                <target>Начать новую партию</target>
+            </trans-unit>
+            <trans-unit id="action.previewBatch.tooltip">
+                <source>Uses DeepL quota when this mode translates text. Does not write records.</source>
+                <target>При переводе текста в этом режиме используется квота DeepL. Не записывает записи.</target>
+            </trans-unit>
+            <trans-unit id="field.customInstructions.placeholder">
+                <source>Add custom instructions (optional)</source>
+                <target>Добавьте пользовательские инструкции (необязательно)</target>
+            </trans-unit>
+            <trans-unit id="workspace.beforeScan">
+                <source>Ready to scan</source>
+                <target>Готов к сканированию</target>
+            </trans-unit>
+            <trans-unit id="panel.pageTreeHint">
+                <source>Choose branches, pages or individual content elements for this batch.</source>
+                <target>Выберите ветки, страницы или отдельные элементы контента для этого пакета.</target>
+            </trans-unit>
+            <trans-unit id="panel.batchInspector">
+                <source>Batch inspector</source>
+                <target>Инспектор партии</target>
+            </trans-unit>
+            <trans-unit id="panel.reviewSelectionHint">
+                <source>Review the resolved batch before generating DeepL suggestions.</source>
+                <target>Просмотрите решенный пакет перед созданием предложений DeepL.</target>
+            </trans-unit>
+            <trans-unit id="filter.searchTree">
+                <source>Search page tree</source>
+                <target>Дерево страниц поиска</target>
+            </trans-unit>
+            <trans-unit id="filter.searchTree.placeholder">
+                <source>Search title, UID or content</source>
+                <target>Поиск по названию, UID или контенту</target>
+            </trans-unit>
+            <trans-unit id="filter.status">
+                <source>Filter page status</source>
+                <target>Статус страницы фильтра</target>
+            </trans-unit>
+            <trans-unit id="filter.all">
+                <source>All</source>
+                <target>Все</target>
+            </trans-unit>
+            <trans-unit id="filter.missing">
+                <source>Missing</source>
+                <target>Отсутствует</target>
+            </trans-unit>
+            <trans-unit id="filter.partial">
+                <source>Partial</source>
+                <target>Частичный</target>
+            </trans-unit>
+            <trans-unit id="filter.translated">
+                <source>Translated</source>
+                <target>Переведено</target>
+            </trans-unit>
+            <trans-unit id="filter.emptyFields">
+                <source>Empty fields</source>
+                <target>Пустые поля</target>
+            </trans-unit>
+            <trans-unit id="filter.hidden">
+                <source>Hidden</source>
+                <target>Скрытый</target>
+            </trans-unit>
+            <trans-unit id="filter.blocked">
+                <source>Blocked</source>
+                <target>Заблокировано</target>
+            </trans-unit>
+            <trans-unit id="filter.sourceMissing">
+                <source>Source missing</source>
+                <target>Источник отсутствует</target>
+            </trans-unit>
+            <trans-unit id="filter.selected">
+                <source>Selected</source>
+                <target>Выбрано</target>
+            </trans-unit>
+            <trans-unit id="filter.hasContent">
+                <source>Has content</source>
+                <target>Имеет контент</target>
+            </trans-unit>
+            <trans-unit id="legend.ariaLabel">
+                <source>Selection legend</source>
+                <target>Легенда выбора</target>
+            </trans-unit>
+            <trans-unit id="tree.branch">
+                <source>Branch</source>
+                <target>Филиал</target>
+            </trans-unit>
+            <trans-unit id="tree.pageOnly">
+                <source>Page</source>
+                <target>Страница</target>
+            </trans-unit>
+            <trans-unit id="tree.page">
+                <source>Page</source>
+                <target>Страница</target>
+            </trans-unit>
+            <trans-unit id="tree.status">
+                <source>Status</source>
+                <target>Статус</target>
+            </trans-unit>
+            <trans-unit id="tree.elementsLocales">
+                <source>Elements / Locales</source>
+                <target>Элементы/локали</target>
+            </trans-unit>
+            <trans-unit id="tree.actions">
+                <source>Actions</source>
+                <target>Действия</target>
+            </trans-unit>
+            <trans-unit id="tree.branch.tooltip">
+                <source>Select this page, child pages and selectable content elements.</source>
+                <target>Выберите эту страницу, дочерние страницы и выбираемые элементы контента.</target>
+            </trans-unit>
+            <trans-unit id="tree.pageOnly.tooltip">
+                <source>Select this page and selectable content elements, without child pages.</source>
+                <target>Выберите эту страницу и выбираемые элементы контента без дочерних страниц.</target>
+            </trans-unit>
+            <trans-unit id="a11y.selectBranch">
+                <source>Select branch and children for page #%d %s</source>
+                <target>Выберите ветку и дочерние элементы для страницы #%d %s.</target>
+            </trans-unit>
+            <trans-unit id="a11y.selectPageOnly">
+                <source>Select page only for page #%d %s</source>
+                <target>Выберите страницу только для страницы #%d %s</target>
+            </trans-unit>
+            <trans-unit id="a11y.includePage">
+                <source>Include %s in this batch</source>
+                <target>Включите %s в этот пакет.</target>
+            </trans-unit>
+            <trans-unit id="a11y.includeElement">
+                <source>Include %s in this batch</source>
+                <target>Включите %s в этот пакет.</target>
+            </trans-unit>
+            <trans-unit id="abbr.elements">
+                <source>el</source>
+                <target>эль</target>
+            </trans-unit>
+            <trans-unit id="abbr.locales">
+                <source>loc</source>
+                <target>место</target>
+            </trans-unit>
+            <trans-unit id="empty.noPagesFound">
+                <source>No pages found for this scan.</source>
+                <target>Для этого сканирования не найдено страниц.</target>
+            </trans-unit>
+            <trans-unit id="empty.noContentElements">
+                <source>No default-language content elements found on this page.</source>
+                <target>На этой странице не найдено элементов контента на языке по умолчанию.</target>
+            </trans-unit>
+            <trans-unit id="empty.choosePageForDetail">
+                <source>Choose a page from the tree to inspect fields and elements.</source>
+                <target>Выберите страницу в дереве, чтобы проверить поля и элементы.</target>
+            </trans-unit>
+            <trans-unit id="label.translationContext">
+                <source>Translation context</source>
+                <target>Контекст перевода</target>
+            </trans-unit>
+            <trans-unit id="label.noGlossary">
+                <source>No glossary</source>
+                <target>Нет глоссария</target>
+            </trans-unit>
+            <trans-unit id="label.noApprovedGlossary">
+                <source>No approved glossary</source>
+                <target>Нет утвержденного глоссария</target>
+            </trans-unit>
+            <trans-unit id="label.noStyleRule">
+                <source>No style rule</source>
+                <target>Нет правила стиля</target>
+            </trans-unit>
+            <trans-unit id="label.noApprovedStyleRule">
+                <source>No approved style rule</source>
+                <target>Нет утвержденного правила стиля</target>
+            </trans-unit>
+            <trans-unit id="label.noWritesYet">
+                <source>No writes yet</source>
+                <target>Пока ничего не пишет</target>
+            </trans-unit>
+            <trans-unit id="label.readyToWriteConfirmedTranslations">
+                <source>Ready to write confirmed translations</source>
+                <target>Готов написать подтвержденные переводы</target>
+            </trans-unit>
+            <trans-unit id="label.writeCompleted">
+                <source>Write completed</source>
+                <target>Запись завершена</target>
+            </trans-unit>
+            <trans-unit id="label.sourceLanguageFallback">
+                <source>Source language</source>
+                <target>Исходный язык</target>
+            </trans-unit>
+            <trans-unit id="label.targetLanguageFallback">
+                <source>Target language</source>
+                <target>Целевой язык</target>
+            </trans-unit>
+            <trans-unit id="label.selectionMetrics">
+                <source>Selection metrics</source>
+                <target>Метрики выбора</target>
+            </trans-unit>
+            <trans-unit id="label.reviewMetrics">
+                <source>Resolved selection metrics</source>
+                <target>Решенные метрики выбора</target>
+            </trans-unit>
+            <trans-unit id="label.items">
+                <source>items</source>
+                <target>предметы</target>
+            </trans-unit>
+            <trans-unit id="label.page">
+                <source>Page</source>
+                <target>Страница</target>
+            </trans-unit>
+            <trans-unit id="label.pages">
+                <source>pages</source>
+                <target>страницы</target>
+            </trans-unit>
+            <trans-unit id="label.element">
+                <source>Element</source>
+                <target>Элемент</target>
+            </trans-unit>
+            <trans-unit id="label.records">
+                <source>records</source>
+                <target>записи</target>
+            </trans-unit>
+            <trans-unit id="label.update">
+                <source>update</source>
+                <target>обновить</target>
+            </trans-unit>
+            <trans-unit id="label.deeplCharacters">
+                <source>DeepL chars</source>
+                <target>DeepL символов</target>
+            </trans-unit>
+            <trans-unit id="label.overwrite">
+                <source>overwrite</source>
+                <target>перезаписать</target>
+            </trans-unit>
+            <trans-unit id="label.skipped">
+                <source>skipped</source>
+                <target>пропущен</target>
+            </trans-unit>
+            <trans-unit id="label.willWriteList">
+                <source>Will write</source>
+                <target>напишу</target>
+            </trans-unit>
+            <trans-unit id="label.selectedElementsOnPage">
+                <source>selected elements on this page</source>
+                <target>выбранные элементы на этой странице</target>
+            </trans-unit>
+            <trans-unit id="label.contentElement">
+                <source>Content element</source>
+                <target>Элемент контента</target>
+            </trans-unit>
+            <trans-unit id="label.untitledPage">
+                <source>Untitled page</source>
+                <target>Страница без названия</target>
+            </trans-unit>
+            <trans-unit id="label.notTranslated">
+                <source>not translated</source>
+                <target>не переведено</target>
+            </trans-unit>
+            <trans-unit id="label.existing">
+                <source>existing</source>
+                <target>существующий</target>
+            </trans-unit>
+            <trans-unit id="label.writable">
+                <source>Writable</source>
+                <target>записываемый</target>
+            </trans-unit>
+            <trans-unit id="mode.translateMissingOnly">
+                <source>Select only not translated</source>
+                <target>Выбрать только не переведено</target>
+            </trans-unit>
+            <trans-unit id="mode.retranslateSelected">
+                <source>Select everything</source>
+                <target>Выбрать все</target>
+            </trans-unit>
+            <trans-unit id="scope.pageOnly">
+                <source>Page only</source>
+                <target>Только страница</target>
+            </trans-unit>
+            <trans-unit id="scope.branchChildren">
+                <source>Branch + children</source>
+                <target>Филиал + дети</target>
+            </trans-unit>
+            <trans-unit id="scope.inheritedBranchChildren">
+                <source>Inherited from branch + children</source>
+                <target>Унаследовано от ветки + дочерние элементы</target>
+            </trans-unit>
+            <trans-unit id="scope.elementPageContext">
+                <source>Element-only page context</source>
+                <target>Контекст страницы, содержащий только элементы</target>
+            </trans-unit>
+            <trans-unit id="origin.direct">
+                <source>direct</source>
+                <target>прямой</target>
+            </trans-unit>
+            <trans-unit id="origin.inherited">
+                <source>inherited</source>
+                <target>унаследованный</target>
+            </trans-unit>
+            <trans-unit id="reason.excluded">
+                <source>Excluded</source>
+                <target>Исключено</target>
+            </trans-unit>
+            <trans-unit id="reason.excludedFromRecursiveBranch">
+                <source>Excluded from recursive branch</source>
+                <target>Исключено из рекурсивной ветки</target>
+            </trans-unit>
+            <trans-unit id="reason.excludedFromPageOnlySelection">
+                <source>Excluded from page-only selection</source>
+                <target>Исключено из выбора только на странице</target>
+            </trans-unit>
+            <trans-unit id="summary.onePageOneElementPattern">
+                <source>1 page record, %d content element</source>
+                <target>1-страничная запись, элемент контента %d</target>
+            </trans-unit>
+            <trans-unit id="summary.onePageElementsPattern">
+                <source>1 page record, %d content elements</source>
+                <target>1-страничная запись, элементы контента %d</target>
+            </trans-unit>
+            <trans-unit id="summary.scopeCountsPattern">
+                <source>%d pages, %d content elements</source>
+                <target>Страницы %d, элементы контента %d</target>
+            </trans-unit>
+            <trans-unit id="summary.onPagePattern">
+                <source>On page #%d %s</source>
+                <target>На странице #%d %s</target>
+            </trans-unit>
+            <trans-unit id="summary.singleContentElement">
+                <source>Single content element</source>
+                <target>Один элемент контента</target>
+            </trans-unit>
+            <trans-unit id="summary.recordLabelPattern">
+                <source>%s #%d %s</source>
+                <target>%s #%d %s</target>
+            </trans-unit>
+            <trans-unit id="summary.elementPermissionCounts">
+                <source>%d total, %d selectable, %d blocked</source>
+                <target>%d всего, %d по выбору, %d заблокирован</target>
+            </trans-unit>
+            <trans-unit id="permission.missingPagesModify">
+                <source>Missing pages modify permission.</source>
+                <target>Отсутствующие страницы позволяют изменить разрешение.</target>
+            </trans-unit>
+            <trans-unit id="permission.noBackendUser">
+                <source>No backend user is available.</source>
+                <target>Серверный пользователь не доступен.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingTableModify">
+                <source>Missing %s modify permission.</source>
+                <target>Отсутствует разрешение на изменение %s.</target>
+            </trans-unit>
+            <trans-unit id="permission.noTargetLanguageAccess">
+                <source>User cannot access target language %d.</source>
+                <target>Пользователь не может получить доступ к целевому языку %d.</target>
+            </trans-unit>
+            <trans-unit id="permission.sourcePageNotFound">
+                <source>Source page %d was not found.</source>
+                <target>Исходная страница %d не найдена.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingPageEdit">
+                <source>Missing page edit permission.</source>
+                <target>Отсутствует разрешение на редактирование страницы.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingContentModify">
+                <source>Missing tt_content modify permission.</source>
+                <target>Отсутствует разрешение на изменение tt_content.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingParentContentEdit">
+                <source>Missing content edit permission on parent page.</source>
+                <target>Отсутствует разрешение на редактирование контента на родительской странице.</target>
+            </trans-unit>
+            <trans-unit id="permission.sourceLanguageRecordMissing">
+                <source>The selected source language record is missing.</source>
+                <target>Выбранная запись исходного языка отсутствует.</target>
+            </trans-unit>
+            <trans-unit id="message.selectionUpdated">
+                <source>Selection updated.</source>
+                <target>Выбор обновлен.</target>
+            </trans-unit>
+            <trans-unit id="message.previewFailed">
+                <source>Preview request failed.</source>
+                <target>Запрос на предварительный просмотр не выполнен.</target>
+            </trans-unit>
+            <trans-unit id="message.writingTranslations">
+                <source>Writing confirmed translations.</source>
+                <target>Написание подтвержденных переводов.</target>
+            </trans-unit>
+            <trans-unit id="tca.job">
+                <source>DeepL batch translation job</source>
+                <target>DeepL пакетный перевод</target>
+            </trans-unit>
+            <trans-unit id="tca.jobItem">
+                <source>DeepL batch translation job item</source>
+                <target>DeepL элемент задания пакетного перевода</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

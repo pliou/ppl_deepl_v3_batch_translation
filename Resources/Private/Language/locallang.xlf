@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff version="1.0">
     <file source-language="en" datatype="plaintext" original="messages" date="2026-05-25T00:00:00Z" product-name="ppl_deepl_v3_batch_translation">
-        <header/>
+        <header />
         <body>
             <trans-unit id="module.root.title"><source>PPL DeepL V3</source></trans-unit>
             <trans-unit id="module.root.description"><source>PPL DeepL V3 translations.</source></trans-unit>
@@ -15,14 +15,14 @@
             <trans-unit id="workflow.scan.hint"><source>Read page tree and status. No writes.</source></trans-unit>
             <trans-unit id="workflow.select"><source>Select</source></trans-unit>
             <trans-unit id="workflow.select.hint"><source>Build pages, branches and elements.</source></trans-unit>
-            <trans-unit id="workflow.review"><source>Review Selection</source></trans-unit>
+            <trans-unit id="workflow.review"><source>Review selection</source></trans-unit>
             <trans-unit id="workflow.review.hint"><source>Inspect direct, inherited and excluded items.</source></trans-unit>
-            <trans-unit id="workflow.preflight"><source>Preflight</source></trans-unit>
-            <trans-unit id="workflow.preflight.hint"><source>Check permissions and planned writes.</source></trans-unit>
-            <trans-unit id="workflow.preview"><source>Preview</source></trans-unit>
-            <trans-unit id="workflow.preview.hint"><source>Uses DeepL quota, writes nothing.</source></trans-unit>
-            <trans-unit id="workflow.execute"><source>Execute</source></trans-unit>
-            <trans-unit id="workflow.execute.hint"><source>Write confirmed preview via DataHandler.</source></trans-unit>
+            
+            
+            
+            
+            
+            
             <trans-unit id="workflow.translationPreview"><source>Translation preview</source></trans-unit>
             <trans-unit id="workflow.translationPreview.hint"><source>Generate cached DeepL suggestions. No writes.</source></trans-unit>
             <trans-unit id="workflow.write"><source>Write</source></trans-unit>
@@ -39,54 +39,54 @@
             <trans-unit id="field.glossary"><source>Glossary</source></trans-unit>
             <trans-unit id="field.styleRule"><source>Style rule</source></trans-unit>
             <trans-unit id="field.customInstructions"><source>Custom instructions</source></trans-unit>
-            <trans-unit id="group.translationSettings"><source>Translation settings</source></trans-unit>
-            <trans-unit id="group.batchControls"><source>Batch scope and actions</source></trans-unit>
+            
+            
             <trans-unit id="action.scan"><source>Scan</source></trans-unit>
-            <trans-unit id="action.restartScan"><source>Restart scan</source></trans-unit>
-            <trans-unit id="action.reviewSelection"><source>Show selected items</source></trans-unit>
+            <trans-unit id="action.restartScan"><source>Rescan</source></trans-unit>
+            <trans-unit id="action.reviewSelection"><source>Review selected items</source></trans-unit>
             <trans-unit id="action.backToTree"><source>Back to tree</source></trans-unit>
-            <trans-unit id="action.preview"><source>Generate DeepL translation preview</source></trans-unit>
-            <trans-unit id="action.previewBatch"><source>Generate DeepL translation preview for selected batch</source></trans-unit>
+            
+            <trans-unit id="action.previewBatch"><source>Generate DeepL preview</source></trans-unit>
             <trans-unit id="action.previewPage"><source>Generate DeepL preview for this page</source></trans-unit>
             <trans-unit id="action.previewElement"><source>Generate DeepL preview for this element</source></trans-unit>
             <trans-unit id="action.repreviewPage"><source>Generate retranslation preview for this page</source></trans-unit>
             <trans-unit id="action.repreviewElement"><source>Generate retranslation preview for this element</source></trans-unit>
-            <trans-unit id="action.execute"><source>Write selected translations</source></trans-unit>
+            <trans-unit id="action.execute"><source>Write confirmed translations</source></trans-unit>
             <trans-unit id="action.retranslateSelected"><source>Regenerate DeepL preview</source></trans-unit>
             <trans-unit id="action.discardPreview"><source>Discard preview</source></trans-unit>
             <trans-unit id="action.clear"><source>Clear selection</source></trans-unit>
             <trans-unit id="action.pagePreview"><source>Page preview</source></trans-unit>
             <trans-unit id="action.backToReview"><source>Back to review selection</source></trans-unit>
             <trans-unit id="action.exportResultLog"><source>Export result log</source></trans-unit>
-            <trans-unit id="action.startNewScan"><source>Start new scan</source></trans-unit>
+            
             <trans-unit id="action.openTranslatedPagePreview"><source>Open translated page preview</source></trans-unit>
             <trans-unit id="action.openTargetRecord"><source>Open target record</source></trans-unit>
-            <trans-unit id="scope.onlyThisPage"><source>Only this page</source></trans-unit>
-            <trans-unit id="scope.recursiveBranch"><source>Recursive branch</source></trans-unit>
+            
+            
             <trans-unit id="scope.elementOnly"><source>Element only</source></trans-unit>
-            <trans-unit id="legend.recursive"><source>Recursive branch (first checkbox) = this page, all child pages and selectable content elements</source></trans-unit>
-            <trans-unit id="legend.onlyPage"><source>Only this page (second checkbox) = this page and selectable content elements, no child pages</source></trans-unit>
+            <trans-unit id="legend.recursive"><source>Branch = this page, child pages and selectable content elements</source></trans-unit>
+            <trans-unit id="legend.onlyPage"><source>Page = this page and selectable content elements, no child pages</source></trans-unit>
             <trans-unit id="legend.elementOnly"><source>Element only = selected content element only</source></trans-unit>
             <trans-unit id="legend.blocked"><source>Blocked = skipped with reason before execution</source></trans-unit>
             <trans-unit id="panel.pageTree"><source>Page tree</source></trans-unit>
             <trans-unit id="panel.selectedPage"><source>Selected page</source></trans-unit>
             <trans-unit id="panel.pageFields"><source>Page fields</source></trans-unit>
             <trans-unit id="panel.contentElements"><source>Content elements</source></trans-unit>
-            <trans-unit id="panel.selectionBasket"><source>Selection basket</source></trans-unit>
-            <trans-unit id="panel.actionPanel"><source>Actions</source></trans-unit>
+            
+            
             <trans-unit id="panel.reviewSelection"><source>Review selection</source></trans-unit>
             <trans-unit id="panel.preflightPreview"><source>Live plan / Translation preview</source></trans-unit>
             <trans-unit id="panel.pagePreview"><source>Page preview</source></trans-unit>
             <trans-unit id="label.hierarchy"><source>Hierarchy</source></trans-unit>
             <trans-unit id="label.targetRecord"><source>Target record</source></trans-unit>
-            <trans-unit id="label.elements"><source>Elements</source></trans-unit>
+            <trans-unit id="label.elements"><source>elements</source></trans-unit>
             <trans-unit id="label.permission"><source>Permission</source></trans-unit>
-            <trans-unit id="label.origin"><source>Origin</source></trans-unit>
+            
             <trans-unit id="label.inheritedVia"><source>Inherited via</source></trans-unit>
-            <trans-unit id="label.excludePage"><source>Exclude this page from the resolved selection</source></trans-unit>
-            <trans-unit id="label.clickPagePreview"><source>Open the page row to preview selectable text and elements.</source></trans-unit>
-            <trans-unit id="label.included"><source>Included</source></trans-unit>
-            <trans-unit id="label.pagePreview"><source>Page preview: text snippets and selectable elements are shown below.</source></trans-unit>
+            
+            
+            
+            
             <trans-unit id="label.liveSelectionSummary"><source>Live selection summary</source></trans-unit>
             <trans-unit id="label.liveSelectionEmpty"><source>Choose a recursive branch, only this page or individual elements to resolve records and fields.</source></trans-unit>
             <trans-unit id="label.selectedPages"><source>selected pages</source></trans-unit>
@@ -109,9 +109,10 @@
             <trans-unit id="label.willUpdate"><source>Will update</source></trans-unit>
             <trans-unit id="label.willSkip"><source>Will skip</source></trans-unit>
             <trans-unit id="label.estimatedCharacters"><source>Estimated DeepL characters</source></trans-unit>
+            
             <trans-unit id="label.sourceValue"><source>Source</source></trans-unit>
             <trans-unit id="label.currentValue"><source>Existing translation</source></trans-unit>
-            <trans-unit id="label.deeplProposal"><source>Translation proposal</source></trans-unit>
+            <trans-unit id="label.deeplProposal"><source>DeepL suggestion</source></trans-unit>
             <trans-unit id="label.translationPlaceholder"><source>Translation will appear here.</source></trans-unit>
             <trans-unit id="label.translationMissing"><source>No existing translation yet.</source></trans-unit>
             <trans-unit id="label.noPendingTranslation"><source>No pending translation</source></trans-unit>
@@ -140,12 +141,122 @@
             <trans-unit id="message.previewDiscarded"><source>Translation preview was discarded.</source></trans-unit>
             <trans-unit id="message.previewNeedsSelection"><source>Choose at least one page, branch or content element before generating a preview.</source></trans-unit>
             <trans-unit id="message.previewReady"><source>DeepL translation preview ready as job #%d. Review it before writing.</source></trans-unit>
+            <trans-unit id="message.previewFailedWithJob"><source>DeepL suggestion generation failed. Audit job #%d was recorded, but nothing is ready to write.</source></trans-unit>
             <trans-unit id="message.writeNeedsPreview"><source>Write requires a confirmed translation preview job for the current selection.</source></trans-unit>
+            <trans-unit id="message.invalidFormToken"><source>The form token is invalid. Please reload the module and try again.</source></trans-unit>
+            <trans-unit id="message.jobAccessDenied"><source>You may only access batch translation jobs that you created.</source></trans-unit>
             <trans-unit id="empty.beforeScan"><source>Choose site and languages, then scan the page tree. Mode is controlled in the action panel.</source></trans-unit>
             <trans-unit id="batch.result.title"><source>Translation results</source></trans-unit>
             <trans-unit id="batch.result.empty"><source>No result rows were recorded for this job.</source></trans-unit>
             <trans-unit id="batch.result.writtenFields"><source>Written fields</source></trans-unit>
+            <trans-unit id="batch.result.errorCode"><source>Error code</source></trans-unit>
             <trans-unit id="tree.rows"><source>rows</source></trans-unit>
+            <trans-unit id="workflow.ariaLabel"><source>Batch translation progress</source></trans-unit>
+            <trans-unit id="workflow.state.current"><source>current step</source></trans-unit>
+            <trans-unit id="workflow.state.completed"><source>completed</source></trans-unit>
+            <trans-unit id="workflow.state.upcoming"><source>upcoming</source></trans-unit>
+            <trans-unit id="workflow.stepAria"><source>Step %d, %s, %s</source></trans-unit>
+            <trans-unit id="site.contextBar"><source>Batch translation context</source></trans-unit>
+            <trans-unit id="group.translationSetup"><source>Translation setup</source></trans-unit>
+            <trans-unit id="action.changeSetup"><source>Change</source></trans-unit>
+            <trans-unit id="action.removeSelection"><source>Remove selection</source></trans-unit>
+            <trans-unit id="action.removeExclusion"><source>Remove exclusion</source></trans-unit>
+            <trans-unit id="action.startNewBatch"><source>Start new batch</source></trans-unit>
+            <trans-unit id="action.previewBatch.tooltip"><source>Uses DeepL quota when this mode translates text. Does not write records.</source></trans-unit>
+            <trans-unit id="field.customInstructions.placeholder"><source>Add custom instructions (optional)</source></trans-unit>
+            <trans-unit id="workspace.beforeScan"><source>Ready to scan</source></trans-unit>
+            <trans-unit id="panel.pageTreeHint"><source>Choose branches, pages or individual content elements for this batch.</source></trans-unit>
+            <trans-unit id="panel.batchInspector"><source>Batch inspector</source></trans-unit>
+            <trans-unit id="panel.reviewSelectionHint"><source>Review the resolved batch before generating DeepL suggestions.</source></trans-unit>
+            <trans-unit id="filter.searchTree"><source>Search page tree</source></trans-unit>
+            <trans-unit id="filter.searchTree.placeholder"><source>Search title, UID or content</source></trans-unit>
+            <trans-unit id="filter.status"><source>Filter page status</source></trans-unit>
+            <trans-unit id="filter.all"><source>All</source></trans-unit>
+            <trans-unit id="filter.missing"><source>Missing</source></trans-unit>
+            <trans-unit id="filter.partial"><source>Partial</source></trans-unit>
+            <trans-unit id="filter.translated"><source>Translated</source></trans-unit>
+            <trans-unit id="filter.emptyFields"><source>Empty fields</source></trans-unit>
+            <trans-unit id="filter.hidden"><source>Hidden</source></trans-unit>
+            <trans-unit id="filter.blocked"><source>Blocked</source></trans-unit>
+            <trans-unit id="filter.sourceMissing"><source>Source missing</source></trans-unit>
+            <trans-unit id="filter.selected"><source>Selected</source></trans-unit>
+            <trans-unit id="filter.hasContent"><source>Has content</source></trans-unit>
+            <trans-unit id="legend.ariaLabel"><source>Selection legend</source></trans-unit>
+            <trans-unit id="tree.branch"><source>Branch</source></trans-unit>
+            <trans-unit id="tree.pageOnly"><source>Page</source></trans-unit>
+            <trans-unit id="tree.page"><source>Page</source></trans-unit>
+            <trans-unit id="tree.status"><source>Status</source></trans-unit>
+            <trans-unit id="tree.elementsLocales"><source>Elements / Locales</source></trans-unit>
+            <trans-unit id="tree.actions"><source>Actions</source></trans-unit>
+            <trans-unit id="tree.branch.tooltip"><source>Select this page, child pages and selectable content elements.</source></trans-unit>
+            <trans-unit id="tree.pageOnly.tooltip"><source>Select this page and selectable content elements, without child pages.</source></trans-unit>
+            <trans-unit id="a11y.selectBranch"><source>Select branch and children for page #%d %s</source></trans-unit>
+            <trans-unit id="a11y.selectPageOnly"><source>Select page only for page #%d %s</source></trans-unit>
+            <trans-unit id="a11y.includePage"><source>Include %s in this batch</source></trans-unit>
+            <trans-unit id="a11y.includeElement"><source>Include %s in this batch</source></trans-unit>
+            <trans-unit id="abbr.elements"><source>el</source></trans-unit>
+            <trans-unit id="abbr.locales"><source>loc</source></trans-unit>
+            <trans-unit id="empty.noPagesFound"><source>No pages found for this scan.</source></trans-unit>
+            <trans-unit id="empty.noContentElements"><source>No default-language content elements found on this page.</source></trans-unit>
+            <trans-unit id="empty.choosePageForDetail"><source>Choose a page from the tree to inspect fields and elements.</source></trans-unit>
+            <trans-unit id="label.translationContext"><source>Translation context</source></trans-unit>
+            <trans-unit id="label.noGlossary"><source>No glossary</source></trans-unit>
+            <trans-unit id="label.noApprovedGlossary"><source>No approved glossary</source></trans-unit>
+            <trans-unit id="label.noStyleRule"><source>No style rule</source></trans-unit>
+            <trans-unit id="label.noApprovedStyleRule"><source>No approved style rule</source></trans-unit>
+            <trans-unit id="label.noWritesYet"><source>No writes yet</source></trans-unit>
+            <trans-unit id="label.readyToWriteConfirmedTranslations"><source>Ready to write confirmed translations</source></trans-unit>
+            <trans-unit id="label.writeCompleted"><source>Write completed</source></trans-unit>
+            <trans-unit id="label.sourceLanguageFallback"><source>Source language</source></trans-unit>
+            <trans-unit id="label.targetLanguageFallback"><source>Target language</source></trans-unit>
+            <trans-unit id="label.selectionMetrics"><source>Selection metrics</source></trans-unit>
+            <trans-unit id="label.reviewMetrics"><source>Resolved selection metrics</source></trans-unit>
+            <trans-unit id="label.items"><source>items</source></trans-unit>
+            <trans-unit id="label.page"><source>Page</source></trans-unit>
+            <trans-unit id="label.pages"><source>pages</source></trans-unit>
+            <trans-unit id="label.element"><source>Element</source></trans-unit>
+            <trans-unit id="label.records"><source>records</source></trans-unit>
+            <trans-unit id="label.update"><source>update</source></trans-unit>
+            <trans-unit id="label.deeplCharacters"><source>DeepL chars</source></trans-unit>
+            <trans-unit id="label.overwrite"><source>overwrite</source></trans-unit>
+            <trans-unit id="label.skipped"><source>skipped</source></trans-unit>
+            <trans-unit id="label.willWriteList"><source>Will write</source></trans-unit>
+            <trans-unit id="label.selectedElementsOnPage"><source>selected elements on this page</source></trans-unit>
+            <trans-unit id="label.contentElement"><source>Content element</source></trans-unit>
+            <trans-unit id="label.untitledPage"><source>Untitled page</source></trans-unit>
+            <trans-unit id="label.notTranslated"><source>not translated</source></trans-unit>
+            <trans-unit id="label.existing"><source>existing</source></trans-unit>
+            <trans-unit id="label.writable"><source>Writable</source></trans-unit>
+            <trans-unit id="mode.translateMissingOnly"><source>Select only not translated</source></trans-unit>
+            <trans-unit id="mode.retranslateSelected"><source>Select everything</source></trans-unit>
+            <trans-unit id="scope.pageOnly"><source>Page only</source></trans-unit>
+            <trans-unit id="scope.branchChildren"><source>Branch + children</source></trans-unit>
+            <trans-unit id="scope.inheritedBranchChildren"><source>Inherited from branch + children</source></trans-unit>
+            <trans-unit id="scope.elementPageContext"><source>Element-only page context</source></trans-unit>
+            <trans-unit id="origin.direct"><source>direct</source></trans-unit>
+            <trans-unit id="origin.inherited"><source>inherited</source></trans-unit>
+            <trans-unit id="reason.excluded"><source>Excluded</source></trans-unit>
+            <trans-unit id="reason.excludedFromRecursiveBranch"><source>Excluded from recursive branch</source></trans-unit>
+            <trans-unit id="reason.excludedFromPageOnlySelection"><source>Excluded from page-only selection</source></trans-unit>
+            <trans-unit id="summary.onePageOneElementPattern"><source>1 page record, %d content element</source></trans-unit>
+            <trans-unit id="summary.onePageElementsPattern"><source>1 page record, %d content elements</source></trans-unit>
+            <trans-unit id="summary.scopeCountsPattern"><source>%d pages, %d content elements</source></trans-unit>
+            <trans-unit id="summary.onPagePattern"><source>On page #%d %s</source></trans-unit>
+            <trans-unit id="summary.singleContentElement"><source>Single content element</source></trans-unit>
+            <trans-unit id="summary.recordLabelPattern"><source>%s #%d %s</source></trans-unit>
+            <trans-unit id="summary.elementPermissionCounts"><source>%d total, %d selectable, %d blocked</source></trans-unit>
+            <trans-unit id="permission.missingPagesModify"><source>Missing pages modify permission.</source></trans-unit>
+            <trans-unit id="permission.noBackendUser"><source>No backend user is available.</source></trans-unit>
+            <trans-unit id="permission.missingTableModify"><source>Missing %s modify permission.</source></trans-unit>
+            <trans-unit id="permission.noTargetLanguageAccess"><source>User cannot access target language %d.</source></trans-unit>
+            <trans-unit id="permission.sourcePageNotFound"><source>Source page %d was not found.</source></trans-unit>
+            <trans-unit id="permission.missingPageEdit"><source>Missing page edit permission.</source></trans-unit>
+            <trans-unit id="permission.missingContentModify"><source>Missing tt_content modify permission.</source></trans-unit>
+            <trans-unit id="permission.missingParentContentEdit"><source>Missing content edit permission on parent page.</source></trans-unit>
+            <trans-unit id="permission.sourceLanguageRecordMissing"><source>The selected source language record is missing.</source></trans-unit>
+            <trans-unit id="message.selectionUpdated"><source>Selection updated.</source></trans-unit>
+            <trans-unit id="message.previewFailed"><source>Preview request failed.</source></trans-unit>
+            <trans-unit id="message.writingTranslations"><source>Writing confirmed translations.</source></trans-unit>
             <trans-unit id="tca.job"><source>DeepL batch translation job</source></trans-unit>
             <trans-unit id="tca.jobItem"><source>DeepL batch translation job item</source></trans-unit>
         </body>

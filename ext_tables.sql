@@ -37,15 +37,18 @@ CREATE TABLE tx_ppldeeplv3batchtranslation_job_item (
   item_type varchar(40) DEFAULT '' NOT NULL,
   source_table varchar(80) DEFAULT '' NOT NULL,
   source_uid int(11) DEFAULT '0' NOT NULL,
+  base_uid int(11) DEFAULT '0' NOT NULL,
   target_uid int(11) DEFAULT '0' NOT NULL,
   source_page_uid int(11) DEFAULT '0' NOT NULL,
   status varchar(40) DEFAULT '' NOT NULL,
+  error_code varchar(80) DEFAULT '' NOT NULL,
   error_message text,
   source_hash varchar(64) DEFAULT '' NOT NULL,
   options_json mediumtext,
   processed_at int(11) DEFAULT '0' NOT NULL,
   PRIMARY KEY (uid),
   KEY job_uid (job_uid),
+  KEY base_record (source_table,base_uid),
   KEY source_record (source_table,source_uid),
   KEY status (status)
 );

@@ -78,8 +78,17 @@ final class BatchPreviewService
                 $item->recordAction,
                 new PermissionResult($item->permission->allowed, $item->permission->reasons),
                 $operations,
-                $item->errors
+                $item->errors,
+                $item->effectiveBaseUid()
             );
+        }
+
+        foreach ($items as $item) {
+            foreach ($item->writableFieldOperations() as $operation) {
+                if ($operation->needsTranslation() && trim($operation->translatedValue) === '') {
+                    $errors[] = sprintf('Missing DeepL suggestion for %s field %s.', $item->itemId, $operation->field);
+                }
+            }
         }
 
         return [
@@ -123,7 +132,8 @@ final class BatchPreviewService
                 $item->recordAction,
                 new PermissionResult($item->permission->allowed, $item->permission->reasons),
                 $operations,
-                $item->errors
+                $item->errors,
+                $item->effectiveBaseUid()
             );
         }
 
@@ -142,8 +152,8 @@ final class BatchPreviewService
         $allowed = [];
         foreach ($plan->items as $item) {
             $include = match ($scopeType) {
-                'page' => $item->sourcePageUid === $scopeUid || ($item->table === 'pages' && $item->sourceUid === $scopeUid),
-                'element' => $item->table === 'tt_content' && $item->sourceUid === $scopeUid,
+                'page' => $item->sourcePageUid === $scopeUid || ($item->table === 'pages' && $item->effectiveBaseUid() === $scopeUid),
+                'element' => $item->table === 'tt_content' && $item->effectiveBaseUid() === $scopeUid,
                 default => true,
             };
             if ($include) {

@@ -1,8 +1,11 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-    <aside class="ppl-batch__panel ppl-batch__panel--basket">
+    <aside class="ppl-batch__panel ppl-batch__panel--basket" aria-label="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.batchInspector')}">
         <div class="ppl-batch__panel-head">
-            <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.selectionBasket" /></strong>
-            <span class="ppl-batch__counter"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.actionPanel" /></span>
+            <div>
+                <h2><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.batchInspector" /></h2>
+                <small>{setupSummary.writeState}</small>
+            </div>
+            <span class="ppl-batch__counter">{workspaceStage}</span>
         </div>
 
         <div class="ppl-batch__basket-mode">
@@ -18,7 +21,7 @@
             <small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:mode.selectionHint" /></small>
         </div>
 
-        <div class="ppl-batch__basket-counts">
+        <div class="ppl-batch__basket-counts" aria-label="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectionMetrics')}">
             <span><strong data-role="basket-count-pages">{basket.counts.pages}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedPages" /></span>
             <span><strong data-role="basket-count-subtrees">{basket.counts.subtrees}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.branches" /></span>
             <span><strong data-role="basket-count-elements">{basket.counts.elements}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></span>
@@ -28,26 +31,12 @@
         </div>
 
         <div class="ppl-batch__basket-rows" data-role="selection-basket">
-            <f:if condition="{basket.groups.pages}">
-                <section class="ppl-batch__basket-group" data-role="basket-group-pages">
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedPagesTitle" /></strong>
-                    <f:for each="{basket.groups.pages}" as="row">
-                        <div class="ppl-batch__basket-row" data-selection-type="{row.type}" data-selection-value="{row.value}">
-                            <input type="hidden" name="selected_pages[]" value="{row.value}">
-                            <span class="ppl-batch__basket-type">{row.scope}</span>
-                            <span>
-                                <strong>{row.label}</strong>
-                                <small>{row.meta}</small>
-                            </span>
-                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="Remove">&times;</button>
-                        </div>
-                    </f:for>
-                </section>
-            </f:if>
-
             <f:if condition="{basket.groups.subtrees}">
                 <section class="ppl-batch__basket-group" data-role="basket-group-subtrees">
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedBranchesTitle" /></strong>
+                    <div class="ppl-batch__basket-group-title">
+                        <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedBranchesTitle" /></strong>
+                        <span>{basket.groups.subtrees -> f:count()} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.items" /></span>
+                    </div>
                     <f:for each="{basket.groups.subtrees}" as="row">
                         <div class="ppl-batch__basket-row" data-selection-type="{row.type}" data-selection-value="{row.value}">
                             <input type="hidden" name="selected_subtree_pages[]" value="{row.value}">
@@ -56,7 +45,27 @@
                                 <strong>{row.label}</strong>
                                 <small>{row.meta}</small>
                             </span>
-                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="Remove">&times;</button>
+                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.removeSelection')}">&times;</button>
+                        </div>
+                    </f:for>
+                </section>
+            </f:if>
+
+            <f:if condition="{basket.groups.pages}">
+                <section class="ppl-batch__basket-group" data-role="basket-group-pages">
+                    <div class="ppl-batch__basket-group-title">
+                        <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedPagesTitle" /></strong>
+                        <span>{basket.groups.pages -> f:count()} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.items" /></span>
+                    </div>
+                    <f:for each="{basket.groups.pages}" as="row">
+                        <div class="ppl-batch__basket-row" data-selection-type="{row.type}" data-selection-value="{row.value}">
+                            <input type="hidden" name="selected_pages[]" value="{row.value}">
+                            <span class="ppl-batch__basket-type">{row.scope}</span>
+                            <span>
+                                <strong>{row.label}</strong>
+                                <small>{row.meta}</small>
+                            </span>
+                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.removeSelection')}">&times;</button>
                         </div>
                     </f:for>
                 </section>
@@ -64,7 +73,10 @@
 
             <f:if condition="{basket.groups.elements}">
                 <section class="ppl-batch__basket-group" data-role="basket-group-elements">
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedElementsTitle" /></strong>
+                    <div class="ppl-batch__basket-group-title">
+                        <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectedElementsTitle" /></strong>
+                        <span>{basket.groups.elements -> f:count()} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.items" /></span>
+                    </div>
                     <f:for each="{basket.groups.elements}" as="row">
                         <div class="ppl-batch__basket-row" data-selection-type="{row.type}" data-selection-value="{row.value}">
                             <input type="hidden" name="selected_elements[]" value="{row.value}">
@@ -73,7 +85,7 @@
                                 <strong>{row.label}</strong>
                                 <small>{row.meta}</small>
                             </span>
-                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="Remove">&times;</button>
+                            <button type="button" class="ppl-batch__icon-button" data-role="remove-selection" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.removeSelection')}">&times;</button>
                         </div>
                     </f:for>
                 </section>
@@ -85,13 +97,13 @@
 
             <f:if condition="{selection.excludedPageUids}">
                 <section class="ppl-batch__basket-group ppl-batch__basket-group--excluded">
-                    <strong>Excluded pages</strong>
+                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.excludedPages" /></strong>
                     <f:for each="{selection.excludedPageUids}" as="pageUid">
                         <div class="ppl-batch__basket-row ppl-batch__basket-row--excluded" data-exclusion-type="page" data-exclusion-value="{pageUid}">
                             <input type="hidden" name="excluded_pages[]" value="{pageUid}">
                             <span class="ppl-batch__basket-type"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.excluded" /></span>
-                            <span><strong>Page #{pageUid}</strong><small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.removedFromRecursiveSelection" /></small></span>
-                            <button type="button" class="ppl-batch__icon-button" data-role="remove-exclusion" title="Remove exclusion">&times;</button>
+                            <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.page" /> #{pageUid}</strong><small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.removedFromRecursiveSelection" /></small></span>
+                            <button type="button" class="ppl-batch__icon-button" data-role="remove-exclusion" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.removeExclusion')}">&times;</button>
                         </div>
                     </f:for>
                 </section>
@@ -99,13 +111,13 @@
 
             <f:if condition="{selection.excludedElementUids}">
                 <section class="ppl-batch__basket-group ppl-batch__basket-group--excluded">
-                    <strong>Excluded elements</strong>
+                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.excludedElements" /></strong>
                     <f:for each="{selection.excludedElementUids}" as="contentUid">
                         <div class="ppl-batch__basket-row ppl-batch__basket-row--excluded" data-exclusion-type="element" data-exclusion-value="{contentUid}">
                             <input type="hidden" name="excluded_elements[]" value="{contentUid}">
                             <span class="ppl-batch__basket-type"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.excluded" /></span>
-                            <span><strong>Element #{contentUid}</strong><small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.removedFromRecursiveSelection" /></small></span>
-                            <button type="button" class="ppl-batch__icon-button" data-role="remove-exclusion" title="Remove exclusion">&times;</button>
+                            <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.element" /> #{contentUid}</strong><small><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.removedFromRecursiveSelection" /></small></span>
+                            <button type="button" class="ppl-batch__icon-button" data-role="remove-exclusion" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.removeExclusion')}">&times;</button>
                         </div>
                     </f:for>
                 </section>
@@ -128,10 +140,37 @@
             </f:if>
         </div>
 
+        <f:if condition="{basket.pendingFieldGroups}">
+            <section class="ppl-batch__pending-fields">
+                <div class="ppl-batch__basket-group-title">
+                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.willWriteList" /></strong>
+                    <span>{basket.pendingFields -> f:count()} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.fields" /></span>
+                </div>
+                <f:for each="{basket.pendingFieldGroups}" as="group">
+                    <details class="ppl-batch__will-write-group" open="open">
+                        <summary>
+                            <strong>{group.recordLabel}</strong>
+                            <span>{group.fieldCount} <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.fields" /></span>
+                        </summary>
+                        <div>
+                            <f:for each="{group.fields}" as="field">
+                                <div class="ppl-batch__pending-field">
+                                    <span class="ppl-batch__basket-type"><f:translate key="{field.actionLabelKey}" /></span>
+                                    <span>
+                                        <strong>{field.fieldLabel}</strong>
+                                        <small>{field.sourcePreview}</small>
+                                    </span>
+                                </div>
+                            </f:for>
+                        </div>
+                    </details>
+                </f:for>
+            </section>
+        </f:if>
+
         <div class="ppl-batch__visibility-card" data-role="preview-visibility-toggle" data-visible="{f:if(condition: actionState.canExecute, then: '1', else: '0')}">
             <div class="ppl-batch__visibility-graphic" aria-hidden="true">
                 <span class="ppl-batch__visibility-eye"><span></span></span>
-                <span class="ppl-batch__visibility-glow"></span>
             </div>
             <div class="ppl-batch__visibility-copy">
                 <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:visibility.title" /></strong>
@@ -141,12 +180,8 @@
                 <span class="ppl-batch__switch-label ppl-batch__switch-label--off"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:visibility.off" /></span>
                 <input type="hidden" name="make_translations_visible" value="0">
                 <f:if condition="{formData.makeTranslationsVisible}">
-                    <f:then>
-                        <input type="checkbox" name="make_translations_visible" value="1" checked="checked">
-                    </f:then>
-                    <f:else>
-                        <input type="checkbox" name="make_translations_visible" value="1">
-                    </f:else>
+                    <f:then><input type="checkbox" name="make_translations_visible" value="1" checked="checked"></f:then>
+                    <f:else><input type="checkbox" name="make_translations_visible" value="1"></f:else>
                 </f:if>
                 <span class="ppl-batch__switch-track"><span class="ppl-batch__switch-thumb"></span></span>
                 <span class="ppl-batch__switch-label ppl-batch__switch-label--on"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:visibility.on" /></span>
@@ -168,17 +203,20 @@
                     </f:if>
                 </f:then>
             </f:if>
+
             <f:if condition="{actionState.canPreview}">
-                <button class="btn btn-primary" type="submit" name="module_action" value="generate_preview:batch:0" title="Uses DeepL quota when this mode translates text. Does not write records."><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.previewBatch" /></button>
+                <button class="btn btn-primary" type="submit" name="module_action" value="generate_preview:batch:0" title="{f:translate(key: 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.previewBatch.tooltip')}"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.previewBatch" /></button>
                 <button class="btn btn-primary" type="submit" name="module_action" value="write_translations" data-role="preview-ready-action" data-preview-action="write" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.execute" /></button>
                 <button class="btn btn-default" type="submit" name="module_action" value="retranslate_selected" data-role="preview-ready-action" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.retranslateSelected" /></button>
                 <button class="btn btn-default" type="submit" name="module_action" value="discard_preview" data-role="preview-ready-action" data-discards-preview="1" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.discardPreview" /></button>
             </f:if>
+
             <f:if condition="{showPagePreview}">
                 <button class="btn btn-primary" type="submit" name="module_action" value="write_translations" data-role="preview-ready-action" data-preview-action="write" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.execute" /></button>
                 <button class="btn btn-default" type="submit" name="module_action" value="retranslate_selected" data-role="preview-ready-action" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.retranslateSelected" /></button>
                 <button class="btn btn-default" type="submit" name="module_action" value="discard_preview" data-role="preview-ready-action" data-discards-preview="1" hidden="hidden" disabled="disabled"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.discardPreview" /></button>
             </f:if>
+
             <f:if condition="{actionState.canBackToTree}">
                 <button class="btn btn-default" type="submit" name="module_action" value="back_to_tree"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.backToTree" /></button>
             </f:if>
@@ -200,7 +238,7 @@
             </f:if>
             <f:if condition="{actionState.canExportResult}">
                 <button class="btn btn-default" type="submit" name="module_action" value="export_result_log"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.exportResultLog" /></button>
-                <button class="btn btn-primary" type="submit" name="module_action" value="clear_selection"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.startNewScan" /></button>
+                <button class="btn btn-primary" type="submit" name="module_action" value="clear_selection"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.startNewBatch" /></button>
             </f:if>
         </div>
     </aside>

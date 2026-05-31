@@ -6,6 +6,7 @@ namespace Ppl\PplDeeplV3BatchTranslation\Controller;
 
 use Ppl\PplDeeplV3BatchTranslation\Service\BatchWorkspaceService;
 use Ppl\PplDeeplV3BatchTranslation\Service\BatchResultViewModelService;
+use Ppl\PplDeeplV3BatchTranslation\Service\BatchJobAccessGuard;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,6 +30,7 @@ final class BatchTranslationController
         private readonly FormProtectionFactory $formProtectionFactory,
         private readonly BatchWorkspaceService $workspaceService,
         private readonly BatchResultViewModelService $resultViewModelService,
+        private readonly BatchJobAccessGuard $jobAccessGuard,
         private readonly ResponseFactoryInterface $responseFactory
     ) {}
 
@@ -43,8 +45,26 @@ final class BatchTranslationController
         $normalizedAction = $this->normalizeAction($action);
         $isJsonPreviewRequest = $this->isJsonPreviewRequest($request, $body, $normalizedAction);
 
+        if (in_array($normalizedAction, ['clear_selection', 'restart_scan', 'generate_preview', 'write_translations', 'retranslate_selected', 'discard_preview', 'export_result_log'], true)
+            && !$formProtection->validateToken((string)($body['form_token'] ?? ''), self::FORM_NAME, self::FORM_ACTION)
+        ) {
+            $body['module_action'] = '';
+            $messages[] = [
+                'type' => 'error',
+                'text' => $this->translate('message.invalidFormToken'),
+            ];
+            $normalizedAction = '';
+        }
+
         if ($normalizedAction === 'export_result_log') {
             $jobUid = max(0, (int)($body['result_job_uid'] ?? ($body['confirmed_job_uid'] ?? 0)));
+            if (!$this->jobAccessGuard->canAccessJob($jobUid)) {
+                $response = $this->responseFactory->createResponse(403)
+                    ->withHeader('Content-Type', 'text/plain; charset=utf-8');
+                $response->getBody()->write($this->jobAccessGuard->accessDeniedMessage());
+
+                return $response;
+            }
             $csv = $this->resultViewModelService->buildCsv($jobUid);
             $response = $this->responseFactory->createResponse(200)
                 ->withHeader('Content-Type', 'text/csv; charset=utf-8')
@@ -52,16 +72,6 @@ final class BatchTranslationController
             $response->getBody()->write($csv);
 
             return $response;
-        }
-
-        if (in_array($normalizedAction, ['clear_selection', 'restart_scan', 'generate_preview', 'write_translations', 'retranslate_selected', 'discard_preview'], true)
-            && !$formProtection->validateToken((string)($body['form_token'] ?? ''), self::FORM_NAME, self::FORM_ACTION)
-        ) {
-            $body['module_action'] = '';
-            $messages[] = [
-                'type' => 'error',
-                'text' => 'The form token is invalid. Please reload the module and try again.',
-            ];
         }
 
         $viewData = $this->workspaceService->handle($body, $messages);

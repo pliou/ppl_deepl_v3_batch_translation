@@ -1,5 +1,5 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-    <main class="ppl-batch__panel ppl-batch__panel--detail">
+    <section class="ppl-batch__panel ppl-batch__panel--detail">
         <div class="ppl-batch__panel-head">
             <f:if condition="{pageDetails.page}">
                 <f:then>
@@ -20,7 +20,7 @@
                 <section class="ppl-batch__detail-summary">
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.hierarchy" /></strong>{pageDetails.page.hierarchy}</span>
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.targetRecord" /></strong>{pageDetails.page.targetState}</span>
-                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></strong>{pageDetails.page.elementCount} total, {pageDetails.page.selectableElementCount} selectable, {pageDetails.page.blockedElementCount} blocked</span>
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:summary.elementPermissionCounts" arguments="{0: pageDetails.page.elementCount, 1: pageDetails.page.selectableElementCount, 2: pageDetails.page.blockedElementCount}" /></span>
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.permission" /></strong>{pageDetails.page.permissionSummary}</span>
                 </section>
                 <section class="ppl-batch__detail-section">
@@ -34,7 +34,7 @@
                             </div>
                         </f:for>
                         <f:if condition="{pageDetails.pageFields}">
-                            <f:else><div class="ppl-batch__empty">No configured page fields contain source text.</div></f:else>
+                            <f:else><div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.noConfiguredPageFields" /></div></f:else>
                         </f:if>
                     </div>
                 </section>
@@ -68,14 +68,14 @@
                             </label>
                         </f:for>
                         <f:if condition="{pageDetails.elements}">
-                            <f:else><div class="ppl-batch__empty">No default-language content elements found on this page.</div></f:else>
+                            <f:else><div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:empty.noContentElements" /></div></f:else>
                         </f:if>
                     </div>
                 </section>
             </f:then>
             <f:else>
-                <div class="ppl-batch__empty">Choose a page from the tree to inspect fields and elements.</div>
+                <div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:empty.choosePageForDetail" /></div>
             </f:else>
         </f:if>
-    </main>
+    </section>
 </html>

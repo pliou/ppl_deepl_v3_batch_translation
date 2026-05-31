@@ -1,12 +1,12 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
-    <main class="ppl-batch__panel ppl-batch__panel--detail">
+    <section class="ppl-batch__panel ppl-batch__panel--detail" aria-labelledby="page-preview-heading">
         <div class="ppl-batch__panel-head">
             <f:if condition="{pageDetails.page}">
                 <f:then>
-                    <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pagePreview" />: {pageDetails.page.title} #{pageDetails.page.uid}</strong>
+                    <h2 id="page-preview-heading"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pagePreview" />: {pageDetails.page.title} #{pageDetails.page.uid}</h2>
                     <span class="ppl-batch__badge ppl-batch__badge--{pageDetails.page.status}">{pageDetails.page.status}</span>
                 </f:then>
-                <f:else><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pagePreview" /></strong></f:else>
+                <f:else><h2 id="page-preview-heading"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.pagePreview" /></h2></f:else>
             </f:if>
         </div>
 
@@ -41,7 +41,7 @@
                 <section class="ppl-batch__detail-summary">
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.hierarchy" /></strong>{pageDetails.page.hierarchy}</span>
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.targetRecord" /></strong>{pageDetails.page.targetState}</span>
-                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></strong>{pageDetails.page.elementCount} total, {pageDetails.page.selectableElementCount} selectable, {pageDetails.page.blockedElementCount} blocked</span>
+                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:summary.elementPermissionCounts" arguments="{0: pageDetails.page.elementCount, 1: pageDetails.page.selectableElementCount, 2: pageDetails.page.blockedElementCount}" /></span>
                     <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.permission" /></strong>{pageDetails.page.permissionSummary}</span>
                 </section>
 
@@ -152,5 +152,5 @@
                 <div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.selectPageForPreview" /></div>
             </f:else>
         </f:if>
-    </main>
+    </section>
 </html>

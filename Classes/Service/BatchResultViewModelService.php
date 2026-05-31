@@ -12,6 +12,7 @@ final class BatchResultViewModelService
 {
     public function __construct(
         private readonly BatchJobLogger $jobLogger,
+        private readonly BatchJobAccessGuard $jobAccessGuard,
         private readonly SiteFinder $siteFinder,
         private readonly UriBuilder $uriBuilder
     ) {}
@@ -26,6 +27,15 @@ final class BatchResultViewModelService
             return [
                 'jobUid' => 0,
                 'status' => '',
+                'counts' => [],
+                'rows' => [],
+                'isEmpty' => true,
+            ];
+        }
+        if (!$this->jobAccessGuard->canAccessStoredJob($stored['job'])) {
+            return [
+                'jobUid' => 0,
+                'status' => 'denied',
                 'counts' => [],
                 'rows' => [],
                 'isEmpty' => true,
@@ -77,18 +87,26 @@ final class BatchResultViewModelService
 
             $table = (string)($item['table'] ?? $storedItem['source_table'] ?? '');
             $sourceUid = (int)($item['sourceUid'] ?? $storedItem['source_uid'] ?? 0);
+            $baseUid = (int)($item['baseUid'] ?? $storedItem['base_uid'] ?? $sourceUid);
             $rows[] = [
+                'jobUid' => (int)$job['uid'],
+                'itemUid' => (int)$storedItem['uid'],
                 'type' => (string)($item['itemType'] ?? $storedItem['item_type'] ?? ''),
                 'table' => $table,
+                'baseUid' => $baseUid,
                 'sourceUid' => $sourceUid,
                 'targetUid' => $targetUid,
+                'sourceLanguageId' => (int)($job['source_language_id'] ?? 0),
+                'targetLanguageId' => (int)($job['target_language_id'] ?? 0),
                 'label' => (string)($item['label'] ?? ($table . ' #' . $sourceUid)),
                 'status' => $status,
+                'statusCode' => $status,
+                'errorCode' => (string)($storedItem['error_code'] ?? ''),
                 'recordAction' => $recordAction,
                 'writtenFields' => implode(', ', $writtenFields),
                 'error' => (string)($storedItem['error_message'] ?? ''),
                 'frontendUrl' => $table === 'pages' && $targetUid > 0
-                    ? $this->frontendUrl((string)($job['site_identifier'] ?? ''), $sourceUid, (int)($job['target_language_id'] ?? 0))
+                    ? $this->frontendUrl((string)($job['site_identifier'] ?? ''), $baseUid, (int)($job['target_language_id'] ?? 0))
                     : '',
                 'backendUrl' => $targetUid > 0 ? $this->backendEditUrl($table, $targetUid) : '',
             ];
@@ -111,17 +129,23 @@ final class BatchResultViewModelService
             return '';
         }
 
-        fputcsv($handle, ['type', 'table', 'source_uid', 'target_uid', 'status', 'record_action', 'written_fields', 'error', 'frontend_url', 'backend_url']);
+        fputcsv($handle, ['job_uid', 'item_uid', 'type', 'table', 'base_uid', 'source_uid', 'target_uid', 'source_language_id', 'target_language_id', 'status_code', 'error_code', 'error_message', 'record_action', 'written_fields', 'frontend_url', 'backend_url']);
         foreach ($result['rows'] as $row) {
             fputcsv($handle, [
+                $row['jobUid'],
+                $row['itemUid'],
                 $row['type'],
                 $row['table'],
+                $row['baseUid'],
                 $row['sourceUid'],
                 $row['targetUid'],
-                $row['status'],
+                $row['sourceLanguageId'],
+                $row['targetLanguageId'],
+                $row['statusCode'],
+                $row['errorCode'],
+                $row['error'],
                 $row['recordAction'],
                 $row['writtenFields'],
-                $row['error'],
                 $row['frontendUrl'],
                 $row['backendUrl'],
             ]);

@@ -12,6 +12,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class TranslationWriter
 {
+    public function __construct(
+        private readonly TranslationValueLimiter $valueLimiter
+    ) {}
+
     /**
      * @param FieldOperation[] $operations
      * @return array{writtenFields: int, errors: string[]}
@@ -26,11 +30,7 @@ final class TranslationWriter
                 continue;
             }
 
-            $dataMap[$operation->table][$operation->targetUid][$operation->field] = $this->applyMaxLength(
-                $operation->translatedValue,
-                $operation->table,
-                $operation->field
-            );
+            $dataMap[$operation->table][$operation->targetUid][$operation->field] = $this->valueLimiter->limit($operation);
             $writtenFields++;
         }
 
@@ -110,13 +110,4 @@ final class TranslationWriter
         return is_array($dataHandler->errorLog ?? null) ? $dataHandler->errorLog : [];
     }
 
-    private function applyMaxLength(string $value, string $table, string $field): string
-    {
-        $max = $GLOBALS['TCA'][$table]['columns'][$field]['config']['max'] ?? 0;
-        if (!is_numeric($max) || (int)$max <= 0) {
-            return $value;
-        }
-
-        return mb_substr($value, 0, (int)$max);
-    }
 }

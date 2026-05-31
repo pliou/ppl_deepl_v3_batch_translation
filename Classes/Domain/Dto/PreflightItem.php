@@ -22,8 +22,14 @@ final class PreflightItem
         public readonly string $recordAction,
         public readonly PermissionResult $permission,
         public readonly array $fieldOperations = [],
-        public readonly array $errors = []
+        public readonly array $errors = [],
+        public readonly int $baseUid = 0
     ) {}
+
+    public function effectiveBaseUid(): int
+    {
+        return $this->baseUid > 0 ? $this->baseUid : $this->sourceUid;
+    }
 
     public function isBlocked(): bool
     {
@@ -55,6 +61,7 @@ final class PreflightItem
             'itemType' => $this->itemType,
             'table' => $this->table,
             'sourceUid' => $this->sourceUid,
+            'baseUid' => $this->effectiveBaseUid(),
             'targetUid' => $this->targetUid,
             'sourcePageUid' => $this->sourcePageUid,
             'label' => $this->label,
@@ -93,7 +100,8 @@ final class PreflightItem
             (string)($data['recordAction'] ?? 'skip'),
             $permission,
             $operations,
-            array_values(array_map('strval', is_array($data['errors'] ?? null) ? $data['errors'] : []))
+            array_values(array_map('strval', is_array($data['errors'] ?? null) ? $data['errors'] : [])),
+            (int)($data['baseUid'] ?? $data['sourceUid'] ?? 0)
         );
     }
 }

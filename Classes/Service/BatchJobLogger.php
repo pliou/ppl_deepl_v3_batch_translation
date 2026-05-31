@@ -79,10 +79,12 @@ final class BatchJobLogger
                 'item_type' => $item->itemType,
                 'source_table' => $item->table,
                 'source_uid' => $item->sourceUid,
+                'base_uid' => $item->effectiveBaseUid(),
                 'target_uid' => $item->targetUid,
                 'source_page_uid' => $item->sourcePageUid,
                 'status' => $item->isBlocked() ? 'blocked' : $item->recordAction,
                 'error_message' => implode('; ', array_merge($item->permission->reasons, $item->errors)),
+                'error_code' => $item->isBlocked() ? $this->errorCodeForItem($item) : '',
                 'source_hash' => hash('sha256', json_encode($item->toArray(), JSON_THROW_ON_ERROR)),
                 'options_json' => json_encode($item->toArray(), JSON_THROW_ON_ERROR),
             ]);
@@ -174,11 +176,12 @@ final class BatchJobLogger
         $this->updateJobStatus($jobUid, 'finished', array_merge($counters, ['finished_at' => time()]));
     }
 
-    public function markItemProcessed(int $itemUid, string $status, string $errorMessage = '', int $targetUid = 0): void
+    public function markItemProcessed(int $itemUid, string $status, string $errorMessage = '', int $targetUid = 0, string $errorCode = ''): void
     {
         $fields = [
             'status' => $status,
             'error_message' => $errorMessage,
+            'error_code' => $errorCode,
             'processed_at' => time(),
             'tstamp' => time(),
         ];
@@ -187,6 +190,62 @@ final class BatchJobLogger
         }
 
         $this->connectionPool->getConnectionForTable(self::ITEM_TABLE)->update(self::ITEM_TABLE, $fields, ['uid' => $itemUid]);
+    }
+
+    /**
+     * @return array{jobs: int, items: int}
+     */
+    public function cleanupFinishedJobs(int $olderThanTimestamp, bool $dryRun = true): array
+    {
+        $jobConnection = $this->connectionPool->getConnectionForTable(self::JOB_TABLE);
+        $queryBuilder = $jobConnection->createQueryBuilder();
+        $jobUids = array_map('intval', $queryBuilder
+            ->select('uid')
+            ->from(self::JOB_TABLE)
+            ->where(
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->in('status', $queryBuilder->createNamedParameter(['finished', 'discarded', 'preview_failed'], \Doctrine\DBAL\ArrayParameterType::STRING)),
+                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($olderThanTimestamp, \PDO::PARAM_INT))
+            )
+            ->executeQuery()
+            ->fetchFirstColumn());
+
+        if ($jobUids === []) {
+            return ['jobs' => 0, 'items' => 0];
+        }
+
+        $itemConnection = $this->connectionPool->getConnectionForTable(self::ITEM_TABLE);
+        $itemQueryBuilder = $itemConnection->createQueryBuilder();
+        $itemCount = (int)$itemQueryBuilder
+            ->count('uid')
+            ->from(self::ITEM_TABLE)
+            ->where(
+                $itemQueryBuilder->expr()->eq('deleted', $itemQueryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $itemQueryBuilder->expr()->in('job_uid', $itemQueryBuilder->createNamedParameter($jobUids, \Doctrine\DBAL\ArrayParameterType::INTEGER))
+            )
+            ->executeQuery()
+            ->fetchOne();
+
+        if (!$dryRun) {
+            $now = time();
+            $jobUpdate = $jobConnection->createQueryBuilder();
+            $jobUpdate
+                ->update(self::JOB_TABLE)
+                ->set('deleted', '1')
+                ->set('tstamp', (string)$now)
+                ->where($jobUpdate->expr()->in('uid', $jobUpdate->createNamedParameter($jobUids, \Doctrine\DBAL\ArrayParameterType::INTEGER)))
+                ->executeStatement();
+
+            $itemUpdate = $itemConnection->createQueryBuilder();
+            $itemUpdate
+                ->update(self::ITEM_TABLE)
+                ->set('deleted', '1')
+                ->set('tstamp', (string)$now)
+                ->where($itemUpdate->expr()->in('job_uid', $itemUpdate->createNamedParameter($jobUids, \Doctrine\DBAL\ArrayParameterType::INTEGER)))
+                ->executeStatement();
+        }
+
+        return ['jobs' => count($jobUids), 'items' => $itemCount];
     }
 
     /**
@@ -238,5 +297,16 @@ final class BatchJobLogger
             (string)($data['styleRuleId'] ?? ''),
             (string)($data['customInstructions'] ?? '')
         );
+    }
+
+    private function errorCodeForItem(PreflightItem $item): string
+    {
+        foreach ($item->errors as $error) {
+            if (str_contains($error, 'source language record')) {
+                return 'source_missing';
+            }
+        }
+
+        return $item->permission->allowed ? 'preflight_error' : 'permission_denied';
     }
 }

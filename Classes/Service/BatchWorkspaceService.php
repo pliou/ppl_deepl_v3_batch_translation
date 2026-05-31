@@ -23,6 +23,7 @@ final class BatchWorkspaceService
         private readonly BatchPreviewService $previewService,
         private readonly BatchExecutionService $executionService,
         private readonly BatchJobLogger $jobLogger,
+        private readonly BatchJobAccessGuard $jobAccessGuard,
         private readonly TranslationResourceOptionService $resourceOptionService,
         private readonly BatchResultViewModelService $resultViewModelService
     ) {}
@@ -43,7 +44,7 @@ final class BatchWorkspaceService
         $makeTranslationsVisible = $this->makeTranslationsVisible($body);
 
         if ($action === 'clear_selection') {
-            if ($this->rawJobStatus($confirmedJobUid) === 'previewed') {
+            if ($this->rawJobStatus($confirmedJobUid) === 'previewed' && $this->jobAccessGuard->canAccessJob($confirmedJobUid)) {
                 $this->jobLogger->discardJob($confirmedJobUid);
             }
             unset($body['selected_pages'], $body['selected_subtree_pages'], $body['selected_elements'], $body['excluded_pages'], $body['excluded_elements'], $body['confirmed_job_uid'], $body['confirmed_preview_job'], $body['result_job_uid']);
@@ -71,7 +72,7 @@ final class BatchWorkspaceService
             $stage = $selection->isEmpty() ? 'scanned' : 'selected_tree_scope';
             $messages[] = ['type' => 'success', 'text' => $this->translate('message.scanComplete')];
         } elseif ($action === 'restart_scan') {
-            if ($this->rawJobStatus($confirmedJobUid) === 'previewed') {
+            if ($this->rawJobStatus($confirmedJobUid) === 'previewed' && $this->jobAccessGuard->canAccessJob($confirmedJobUid)) {
                 $this->jobLogger->discardJob($confirmedJobUid);
             }
             $confirmedJobUid = 0;
@@ -93,9 +94,11 @@ final class BatchWorkspaceService
         }
 
         if ($action === 'discard_preview') {
-            if ($confirmedJobStatus === 'previewed') {
+            if ($confirmedJobStatus === 'previewed' && $this->jobAccessGuard->canAccessJob($confirmedJobUid)) {
                 $this->jobLogger->discardJob($confirmedJobUid);
                 $messages[] = ['type' => 'success', 'text' => $this->translate('message.previewDiscarded')];
+            } elseif ($confirmedJobUid > 0) {
+                $messages[] = ['type' => 'error', 'text' => $this->jobAccessGuard->accessDeniedMessage()];
             }
             $confirmedJobUid = 0;
             $confirmedJobStatus = '';
@@ -118,19 +121,35 @@ final class BatchWorkspaceService
                     $previewScope['uid']
                 );
                 $plan = $preview['plan'];
-                $jobUid = $this->jobLogger->createJobFromPlan($plan, 'previewed');
-                $plan = $plan->withJobUid($jobUid);
-                if ($this->rawJobStatus($confirmedJobUid) === 'previewed' && $confirmedJobUid !== $jobUid) {
-                    $this->jobLogger->discardJob($confirmedJobUid);
-                }
-                $stage = 'preview_ready';
-                $confirmedJobUid = $jobUid;
-                $confirmedJobStatus = 'previewed';
-                $cachedPreviewPlan = $plan;
-                $resultJobUid = 0;
-                $messages[] = ['type' => 'success', 'text' => sprintf($this->translate('message.previewReady'), $jobUid)];
-                foreach ($preview['errors'] as $error) {
-                    $messages[] = ['type' => 'error', 'text' => $error];
+                if ($preview['errors'] !== []) {
+                    $failedJobUid = $this->jobLogger->createJobFromPlan($plan, 'preview_failed');
+                    if ($this->rawJobStatus($confirmedJobUid) === 'previewed'
+                        && $confirmedJobUid !== $failedJobUid
+                        && $this->jobAccessGuard->canAccessJob($confirmedJobUid)
+                    ) {
+                        $this->jobLogger->discardJob($confirmedJobUid);
+                    }
+                    $stage = 'review_selection';
+                    $confirmedJobUid = 0;
+                    $confirmedJobStatus = '';
+                    $cachedPreviewPlan = null;
+                    $resultJobUid = 0;
+                    $messages[] = ['type' => 'error', 'text' => sprintf($this->translate('message.previewFailedWithJob'), $failedJobUid)];
+                    foreach ($preview['errors'] as $error) {
+                        $messages[] = ['type' => 'error', 'text' => $error];
+                    }
+                } else {
+                    $jobUid = $this->jobLogger->createJobFromPlan($plan, 'previewed');
+                    $plan = $plan->withJobUid($jobUid);
+                    if ($this->rawJobStatus($confirmedJobUid) === 'previewed' && $confirmedJobUid !== $jobUid && $this->jobAccessGuard->canAccessJob($confirmedJobUid)) {
+                        $this->jobLogger->discardJob($confirmedJobUid);
+                    }
+                    $stage = 'preview_ready';
+                    $confirmedJobUid = $jobUid;
+                    $confirmedJobStatus = 'previewed';
+                    $cachedPreviewPlan = $plan;
+                    $resultJobUid = 0;
+                    $messages[] = ['type' => 'success', 'text' => sprintf($this->translate('message.previewReady'), $jobUid)];
                 }
             }
         }
@@ -176,7 +195,7 @@ final class BatchWorkspaceService
             trim((string)($body['tree_status_filter'] ?? 'all'))
         );
         $pageDetails = $this->decoratePageDetailsWithPlan($this->markSelectedElements(
-            $this->pageTreeService->getPageDetails($activePageUid, $selection->targetLanguageId, $rootPageUid),
+            $this->pageTreeService->getPageDetails($activePageUid, $selection->sourceLanguageId, $selection->targetLanguageId, $rootPageUid),
             $selection
         ), $plan);
         $selectionReview = $this->decorateSelectionReviewWithPlan(
@@ -187,6 +206,9 @@ final class BatchWorkspaceService
         $resultView = $stage === 'results' && $resultJobUid > 0
             ? $this->resultViewModelService->build($resultJobUid)
             : null;
+
+        $workflowSteps = $this->buildWorkflowSteps($stage, $action, $selection, $plan, $confirmedJobStatus);
+        $activeWorkflowStep = $this->activeWorkflowStep($workflowSteps);
 
         return [
             'messages' => $messages,
@@ -209,6 +231,7 @@ final class BatchWorkspaceService
                 'makeTranslationsVisible' => $makeTranslationsVisible,
                 'scanAction' => $stage === 'empty' ? 'scan' : 'restart_scan',
                 'scanLabelKey' => $stage === 'empty' ? 'action.scan' : 'action.restartScan',
+                'setupExpanded' => $stage === 'empty' || in_array($stage, ['scanned', 'selected_tree_scope'], true),
             ],
             'siteOptions' => $siteOptions,
             'languageOptions' => $languageOptions,
@@ -219,29 +242,31 @@ final class BatchWorkspaceService
             'styleRuleOptions' => $styleRuleOptions,
             'styleRuleOptionsJson' => json_encode((object)$this->resourceOptionService->getStyleRuleDisplayOptions(), JSON_THROW_ON_ERROR),
             'styleRuleOptionsByLanguageJson' => json_encode((object)$this->resourceOptionService->getStyleRuleOptionsByLanguage(), JSON_THROW_ON_ERROR),
-            'translationModes' => TranslationMode::options(),
-            'statusFilters' => [
-                'all' => 'All',
-                'missing' => 'Missing',
-                'partial' => 'Partial',
-                'translated' => 'Translated',
-                'translated_but_empty_fields' => 'Empty fields',
-                'hidden' => 'Hidden',
-                'blocked' => 'Blocked',
-                'selected' => 'Selected',
-                'has_content' => 'Has content',
-            ],
+            'translationModes' => $this->translationModeOptions(),
+            'statusFilters' => $this->statusFilterOptions(),
+            'setupSummary' => $this->buildSetupSummary(
+                $languageOptions,
+                $selection,
+                $glossaryOptions,
+                $styleRuleOptions,
+                (string)($site['label'] ?? $selection->siteIdentifier),
+                $confirmedJobStatus,
+                $stage
+            ),
+            'jsLabels' => $this->jsLabels(),
             'selection' => $selection->toArray(),
             'basket' => $this->basketSummaryService->summarize($selection, $plan),
             'selectionReview' => $selectionReview,
             'actionState' => $actionState,
-            'workflowSteps' => $this->buildWorkflowSteps($stage, $action, $selection, $plan, $confirmedJobStatus),
+            'workflowSteps' => $workflowSteps,
+            'activeWorkflowStep' => $activeWorkflowStep,
             'lastAction' => $action,
             'workspaceStage' => $stage,
             'showEmptyWorkspace' => $stage === 'empty',
             'showTreeWorkspace' => in_array($stage, ['scanned', 'selected_tree_scope'], true),
             'showReviewWorkspace' => in_array($stage, ['review_selection', 'preview_ready'], true),
             'showPagePreview' => $stage === 'page_preview',
+            'showPreviewSummary' => $stage === 'preview_ready' && $plan instanceof PreflightPlan,
             'showResults' => $stage === 'results',
             'confirmedJobUid' => $confirmedJobUid,
             'confirmedJobStatus' => $confirmedJobStatus,
@@ -555,6 +580,9 @@ final class BatchWorkspaceService
         }
 
         $job = $loadedJob['job'];
+        if (!$this->jobAccessGuard->canAccessStoredJob($job)) {
+            return '';
+        }
         if ((string)($job['site_identifier'] ?? '') !== $selection->siteIdentifier
             || (int)($job['source_language_id'] ?? -1) !== $selection->sourceLanguageId
             || (int)($job['target_language_id'] ?? -1) !== $selection->targetLanguageId
@@ -673,7 +701,7 @@ final class BatchWorkspaceService
         $operationsByRecord = [];
         foreach ($plan->items as $item) {
             foreach ($item->fieldOperations as $operation) {
-                $operationsByRecord[$operation->table . ':' . $operation->sourceUid][] = $this->operationView($operation);
+                $operationsByRecord[$operation->table . ':' . $item->effectiveBaseUid()][] = $this->operationView($operation);
             }
         }
 
@@ -709,7 +737,7 @@ final class BatchWorkspaceService
                 if (trim($operation->translatedValue) === '') {
                     continue;
                 }
-                $operationsByRecord[$operation->table . ':' . $operation->sourceUid][] = $this->operationView($operation);
+                $operationsByRecord[$operation->table . ':' . $item->effectiveBaseUid()][] = $this->operationView($operation);
             }
         }
 
@@ -731,7 +759,7 @@ final class BatchWorkspaceService
                 if (trim($operation->translatedValue) === '') {
                     continue;
                 }
-                $operationsByRecordAndField[$operation->table . ':' . $operation->sourceUid . ':' . $operation->field] = $this->operationView($operation);
+                $operationsByRecordAndField[$operation->table . ':' . $item->effectiveBaseUid() . ':' . $operation->field] = $this->operationView($operation);
             }
         }
 
@@ -779,6 +807,29 @@ final class BatchWorkspaceService
         return false;
     }
 
+    private function planHasExecutableWork(?PreflightPlan $plan): bool
+    {
+        if (!$plan instanceof PreflightPlan) {
+            return false;
+        }
+
+        foreach ($plan->items as $item) {
+            if ($item->isBlocked() || $item->recordAction === 'skip') {
+                continue;
+            }
+            if (!$plan->selection->mode->translatesText()) {
+                return true;
+            }
+            foreach ($item->writableFieldOperations() as $operation) {
+                if (trim($operation->translatedValue) !== '') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @return array<string, bool|string>
      */
@@ -788,7 +839,7 @@ final class BatchWorkspaceService
         $hasPreview = $confirmedJobUid > 0 && $confirmedJobStatus === 'previewed';
         $canShowSelectedItems = $hasSelection && in_array($stage, ['scanned', 'selected_tree_scope'], true);
         $canGeneratePreview = $hasSelection && !$hasPreview && $stage === 'review_selection';
-        $canWrite = $hasPreview && $stage === 'preview_ready' && !$selection->mode->isPreviewOnly();
+        $canWrite = $hasPreview && $stage === 'preview_ready' && !$selection->mode->isPreviewOnly() && $this->planHasExecutableWork($plan);
         $canRetranslate = $hasPreview && $selection->mode->translatesText() && $this->planHasExistingTargetsOrOverwrites($plan);
         $primaryAction = 'scan';
 
@@ -825,7 +876,103 @@ final class BatchWorkspaceService
     }
 
     /**
-     * @return array<int, array{number: int, labelKey: string, hintKey: string, state: string}>
+     * @param array<int, array{id: int, title: string, locale: string, deeplSource: string, deeplTarget: string}> $languageOptions
+     * @param array<string, string> $glossaryOptions
+     * @param array<string, string> $styleRuleOptions
+     * @return array<string, string>
+     */
+    private function buildSetupSummary(array $languageOptions, BatchSelection $selection, array $glossaryOptions, array $styleRuleOptions, string $siteLabel, string $confirmedJobStatus, string $stage): array
+    {
+        $source = $this->languageDisplayLabel($languageOptions, $selection->sourceLanguageId, true);
+        $target = $this->languageDisplayLabel($languageOptions, $selection->targetLanguageId, false);
+        $glossary = (string)$selection->glossaryId !== ''
+            ? (string)($glossaryOptions[(string)$selection->glossaryId] ?? $this->translate('label.noApprovedGlossary'))
+            : $this->translate('label.noApprovedGlossary');
+        $styleRule = $selection->styleRuleId !== ''
+            ? (string)($styleRuleOptions[$selection->styleRuleId] ?? $this->translate('label.noApprovedStyleRule'))
+            : $this->translate('label.noApprovedStyleRule');
+
+        $writeState = match (true) {
+            $stage === 'results' => $this->translate('label.writeCompleted'),
+            $confirmedJobStatus === 'previewed' => $this->translate('label.readyToWriteConfirmedTranslations'),
+            default => $this->translate('label.noWritesYet'),
+        };
+
+        return [
+            'source' => $source,
+            'target' => $target,
+            'pair' => $source . ' -> ' . $target,
+            'glossary' => $glossary,
+            'styleRule' => $styleRule,
+            'site' => $siteLabel,
+            'writeState' => $writeState,
+        ];
+    }
+
+    /**
+     * @param array<int, array{id: int, title: string, locale: string, deeplSource: string, deeplTarget: string}> $languageOptions
+     */
+    private function languageDisplayLabel(array $languageOptions, int $languageId, bool $source): string
+    {
+        foreach ($languageOptions as $language) {
+            if ((int)$language['id'] === $languageId) {
+                $code = (string)($source ? $language['deeplSource'] : $language['deeplTarget']);
+                return trim((string)$language['title']) . ($code !== '' ? ' (' . $code . ')' : '');
+            }
+        }
+
+        return $source ? $this->translate('label.sourceLanguageFallback') : $this->translate('label.targetLanguageFallback');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function translationModeOptions(): array
+    {
+        return [
+            TranslationMode::TranslateMissingOnly->value => $this->translate('mode.translateMissingOnly'),
+            TranslationMode::RetranslateSelected->value => $this->translate('mode.retranslateSelected'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function statusFilterOptions(): array
+    {
+        return [
+            'all' => $this->translate('filter.all'),
+            'missing' => $this->translate('filter.missing'),
+            'partial' => $this->translate('filter.partial'),
+            'translated' => $this->translate('filter.translated'),
+            'translated_but_empty_fields' => $this->translate('filter.emptyFields'),
+            'hidden' => $this->translate('filter.hidden'),
+            'blocked' => $this->translate('filter.blocked'),
+            'source_missing' => $this->translate('filter.sourceMissing'),
+            'selected' => $this->translate('filter.selected'),
+            'has_content' => $this->translate('filter.hasContent'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function jsLabels(): array
+    {
+        return [
+            'selectedPagesTitle' => $this->translate('label.selectedPagesTitle'),
+            'selectedBranchesTitle' => $this->translate('label.selectedBranchesTitle'),
+            'selectedElementsTitle' => $this->translate('label.selectedElementsTitle'),
+            'removeSelection' => $this->translate('action.removeSelection'),
+            'removeExclusion' => $this->translate('action.removeExclusion'),
+            'selectionUpdated' => $this->translate('message.selectionUpdated'),
+            'previewFailed' => $this->translate('message.previewFailed'),
+            'writingTranslations' => $this->translate('message.writingTranslations'),
+        ];
+    }
+
+    /**
+     * @return array<int, array{number: int, labelKey: string, hintKey: string, state: string, isActive: bool, isDone: bool, ariaLabel: string}>
      */
     private function buildWorkflowSteps(string $stage, string $action, BatchSelection $selection, mixed $plan, string $confirmedJobStatus): array
     {
@@ -835,7 +982,7 @@ final class BatchWorkspaceService
 
         $steps = [
             'scope' => 'done',
-            'scan' => $stage === 'empty' || in_array($action, ['scan', 'restart_scan'], true) ? 'active' : 'done',
+            'scan' => $stage === 'empty' ? 'active' : 'done',
             'select' => in_array($stage, ['scanned', 'selected_tree_scope'], true) ? 'active' : ($hasSelection ? 'done' : 'pending'),
             'review' => in_array($stage, ['review_selection', 'page_preview'], true) ? 'active' : (in_array($stage, ['preview_ready', 'writing', 'results'], true) ? 'done' : ($hasSelection ? 'pending' : 'pending')),
             'translationPreview' => $stage === 'preview_ready' ? 'active' : ($hasPreview ? 'done' : ($hasSelection ? 'pending' : 'pending')),
@@ -856,15 +1003,40 @@ final class BatchWorkspaceService
         $workflowSteps = [];
         $number = 1;
         foreach ($labels as $key => $labelKeys) {
+            $state = $steps[$key];
+            $label = $this->translate($labelKeys[0]);
+            $stateLabel = match ($state) {
+                'active' => $this->translate('workflow.state.current'),
+                'done' => $this->translate('workflow.state.completed'),
+                default => $this->translate('workflow.state.upcoming'),
+            };
             $workflowSteps[] = [
                 'number' => $number++,
                 'labelKey' => 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:' . $labelKeys[0],
                 'hintKey' => 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:' . $labelKeys[1],
-                'state' => $steps[$key],
+                'state' => $state,
+                'isActive' => $state === 'active',
+                'isDone' => $state === 'done',
+                'ariaLabel' => sprintf($this->translate('workflow.stepAria'), $number - 1, $label, $stateLabel),
             ];
         }
 
         return $workflowSteps;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $workflowSteps
+     * @return array<string, mixed>
+     */
+    private function activeWorkflowStep(array $workflowSteps): array
+    {
+        foreach ($workflowSteps as $step) {
+            if (!empty($step['isActive'])) {
+                return $step;
+            }
+        }
+
+        return $workflowSteps[0] ?? [];
     }
 
     /**

@@ -14,14 +14,14 @@ The top settings area is for translation context only:
 - Style rule
 - Custom instructions
 - Site
-- Scan / Restart scan
+- Scan / Rescan
 
 The right action panel owns selection and write behavior:
 
 - Selection preset
 - Live selection summary
-- Show selected items
-- Generate DeepL translation preview
+- Review selected items
+- Generate DeepL preview
 - Write selected translations
 - Regenerate preview
 - Discard preview
@@ -77,7 +77,7 @@ Example:
 
 DeepL preview and DataHandler write remain separate steps:
 
-- `Generate DeepL translation preview` may call DeepL and stores proposals.
+- `Generate DeepL preview` may call DeepL and stores proposals.
 - `Write selected translations` writes confirmed proposals via TYPO3 DataHandler.
 - Existing target values are overwritten only when the user chose `Select everything` and then confirms the generated preview/write flow.
 
@@ -98,3 +98,39 @@ Example:
 - target slug should become `/team-notes`, not remain `/team-notizen`
 
 Existing result logs may contain older frontend URLs from before slug regeneration. Current records and newly written results should use the corrected slugs.
+
+## Guided Wizard Layout
+
+The backend module is intentionally shaped as a guided batch translation assistant:
+
+- compact app header
+- compact horizontal stepper
+- context bar for site, root page and page count
+- collapsible Translation setup
+- main workspace for the current step
+- right-side Batch inspector
+
+Do not reintroduce the old large workflow cards or make the setup form visually dominate the page tree/review workspace. Step 3 focuses the page tree. Step 4 focuses the resolved selected batch. Preview and write remain separate and must be communicated as separate states.
+
+## One Primary Action Per Step
+
+Each step has exactly one dominant blue primary action:
+
+- Select: Review selected items
+- Review selection: Generate DeepL preview
+- Translation preview: Write confirmed translations
+- Results: Start new batch
+
+Secondary actions such as Back to tree, Clear selection, per-element preview, retranslate and discard preview must remain visually secondary.
+
+## Theme Tokens And Dark Mode
+
+Backend colors are controlled through CSS custom properties in `backend.css`. Component rules should use tokens such as `--ppl-bg-surface`, `--ppl-text`, `--ppl-primary`, `--ppl-warning` and `--ppl-danger`; do not add one-off component hex colors. Light mode, `[data-theme="dark"]` and `prefers-color-scheme: dark` must keep cards, badges, buttons, tables and focus states readable.
+
+## Accessibility Baseline
+
+Keep the stepper exposed as navigation with `aria-current="step"` on the active step. Branch and page checkboxes in the page tree must have unique accessible names. Status badges must contain visible text, not just color. The module keeps an `aria-live` region for selection, preview and write-state changes, and the main workspace receives focus after step-changing form actions.
+
+## No Write Before Confirmation
+
+DeepL preview generation may call the provider and cache suggestions, but it must not write TYPO3 records. The write button must only appear after a confirmed preview job exists, and the browser confirmation before `write_translations` must stay in place.

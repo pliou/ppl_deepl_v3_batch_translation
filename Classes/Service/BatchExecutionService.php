@@ -10,6 +10,9 @@ final class BatchExecutionService
 {
     public function __construct(
         private readonly BatchJobLogger $jobLogger,
+        private readonly BatchJobAccessGuard $jobAccessGuard,
+        private readonly BatchRecordMappingService $recordMappingService,
+        private readonly BatchPermissionService $permissionService,
         private readonly RecordLocalizationService $localizationService,
         private readonly TranslationWriter $writer
     ) {}
@@ -25,6 +28,10 @@ final class BatchExecutionService
         }
 
         $job = $stored['job'];
+        if (!$this->jobAccessGuard->canAccessStoredJob($job)) {
+            return $this->result('error', $this->jobAccessGuard->accessDeniedMessage(), []);
+        }
+
         $status = (string)($job['status'] ?? '');
         $mode = (string)($job['translation_mode'] ?? '');
         if ($status !== 'previewed') {
@@ -50,13 +57,13 @@ final class BatchExecutionService
             $item = $this->decodeItem((string)($storedItem['options_json'] ?? ''));
             if ($item === null) {
                 $counters['failed_items']++;
-                $this->jobLogger->markItemProcessed($itemUid, 'failed', 'Stored preview item could not be decoded.');
+                $this->jobLogger->markItemProcessed($itemUid, 'failed', 'Stored preview item could not be decoded.', 0, 'decode_failed');
                 continue;
             }
 
             if (!$this->isItemWritable($item)) {
                 $counters['blocked_items']++;
-                $this->jobLogger->markItemProcessed($itemUid, 'blocked', $this->itemErrors($item));
+                $this->jobLogger->markItemProcessed($itemUid, 'blocked', $this->itemErrors($item), 0, $this->itemErrorCode($item));
                 continue;
             }
 
@@ -66,22 +73,50 @@ final class BatchExecutionService
                 continue;
             }
 
+            $freshValidation = $this->validateFreshItem($job, $item);
+            if ($freshValidation['errorCode'] !== '') {
+                $counters[$freshValidation['status'] === 'blocked' ? 'blocked_items' : 'failed_items']++;
+                $this->jobLogger->markItemProcessed(
+                    $itemUid,
+                    $freshValidation['status'],
+                    $freshValidation['message'],
+                    0,
+                    $freshValidation['errorCode']
+                );
+                continue;
+            }
+
+            if ($this->requiresTranslatedValues($mode, $item) && !$this->hasTranslatedValues($item)) {
+                $counters['failed_items']++;
+                $this->jobLogger->markItemProcessed($itemUid, 'failed', 'Expected translated field values are missing.', 0, 'missing_translation_values');
+                continue;
+            }
+
             try {
+                $baseUid = (int)($item['baseUid'] ?? $item['sourceUid'] ?? 0);
+                $translationSourceUid = (int)($item['sourceUid'] ?? 0);
                 $targetUid = (int)($item['targetUid'] ?? 0);
                 $targetWasCreated = $targetUid <= 0;
                 if ($targetUid <= 0) {
                     $targetUid = $this->localizationService->ensureLocalizedRecord(
                         (string)$item['table'],
-                        (int)$item['sourceUid'],
-                        (int)$job['target_language_id']
+                        $baseUid,
+                        (int)$job['target_language_id'],
+                        $translationSourceUid
                     );
                 }
 
                 $operations = $this->operationsForItem($item, $targetUid);
+                if ($this->requiresTranslatedValues($mode, $item) && $operations === []) {
+                    $counters['failed_items']++;
+                    $this->jobLogger->markItemProcessed($itemUid, 'failed', 'No translated field values are available to write.', $targetUid, 'missing_translation_values');
+                    continue;
+                }
+
                 $writeResult = $this->writer->write($operations);
                 if ($writeResult['errors'] !== []) {
                     $counters['failed_items']++;
-                    $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $writeResult['errors']));
+                    $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $writeResult['errors']), $targetUid, 'datahandler_write_failed');
                     continue;
                 }
 
@@ -93,7 +128,7 @@ final class BatchExecutionService
                     $visibilityErrors = $this->writer->unhideRecord((string)$item['table'], $targetUid);
                     if ($visibilityErrors !== []) {
                         $counters['failed_items']++;
-                        $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $visibilityErrors), $targetUid);
+                        $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $visibilityErrors), $targetUid, 'visibility_failed');
                         continue;
                     }
                     $counters['made_visible_items']++;
@@ -103,7 +138,7 @@ final class BatchExecutionService
                     $slugErrors = $this->writer->regeneratePageSlug($targetUid);
                     if ($slugErrors !== []) {
                         $counters['failed_items']++;
-                        $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $slugErrors), $targetUid);
+                        $this->jobLogger->markItemProcessed($itemUid, 'failed', implode('; ', $slugErrors), $targetUid, 'slug_failed');
                         continue;
                     }
                 }
@@ -113,7 +148,7 @@ final class BatchExecutionService
                 $this->jobLogger->markItemProcessed($itemUid, $writeResult['writtenFields'] > 0 ? 'translated' : 'localized', '', $targetUid);
             } catch (\Throwable $exception) {
                 $counters['failed_items']++;
-                $this->jobLogger->markItemProcessed($itemUid, 'failed', $exception->getMessage());
+                $this->jobLogger->markItemProcessed($itemUid, 'failed', $exception->getMessage(), 0, 'execution_exception');
             }
         }
 
@@ -173,6 +208,76 @@ final class BatchExecutionService
         $errors = is_array($item['errors'] ?? null) ? $item['errors'] : [];
 
         return implode('; ', array_merge($reasons, $errors));
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function itemErrorCode(array $item): string
+    {
+        foreach (is_array($item['errors'] ?? null) ? $item['errors'] : [] as $error) {
+            if (str_contains((string)$error, 'source language record')) {
+                return 'source_missing';
+            }
+        }
+
+        $permission = $item['permission'] ?? [];
+
+        return is_array($permission) && empty($permission['allowed']) ? 'permission_denied' : 'preflight_error';
+    }
+
+    /**
+     * @param array<string, mixed> $job
+     * @param array<string, mixed> $item
+     * @return array{status: string, errorCode: string, message: string}
+     */
+    private function validateFreshItem(array $job, array $item): array
+    {
+        $table = (string)($item['table'] ?? '');
+        $baseUid = (int)($item['baseUid'] ?? $item['sourceUid'] ?? 0);
+        $sourceUid = (int)($item['sourceUid'] ?? 0);
+        $sourceLanguageId = (int)($job['source_language_id'] ?? 0);
+        $targetLanguageId = (int)($job['target_language_id'] ?? 0);
+        $sourcePageUid = (int)($item['sourcePageUid'] ?? 0);
+        $baseRecord = $this->recordMappingService->fetchRecord($table, $baseUid);
+        if ($baseRecord === null) {
+            return ['status' => 'failed', 'errorCode' => 'base_missing', 'message' => 'Base record no longer exists.'];
+        }
+
+        $sourceRecord = $sourceLanguageId <= 0 ? $baseRecord : $this->recordMappingService->fetchRecord($table, $sourceUid);
+        if ($sourceRecord === null || (int)($sourceRecord['sys_language_uid'] ?? -1) !== $sourceLanguageId) {
+            return ['status' => 'blocked', 'errorCode' => 'source_missing', 'message' => 'Selected source language record is missing.'];
+        }
+
+        $permission = $this->permissionService->checkRecordAccess($table, $baseRecord, $sourcePageUid, $targetLanguageId);
+        if (!$permission->allowed) {
+            return ['status' => 'blocked', 'errorCode' => 'permission_denied', 'message' => implode('; ', $permission->reasons)];
+        }
+
+        return ['status' => '', 'errorCode' => '', 'message' => ''];
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function requiresTranslatedValues(string $mode, array $item): bool
+    {
+        return $mode !== 'create_missing_records_only'
+            && (string)($item['recordAction'] ?? '') !== 'skip';
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function hasTranslatedValues(array $item): bool
+    {
+        foreach (is_array($item['fieldOperations'] ?? null) ? $item['fieldOperations'] : [] as $operationData) {
+            if (is_array($operationData) && trim((string)($operationData['translatedValue'] ?? '')) !== '') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

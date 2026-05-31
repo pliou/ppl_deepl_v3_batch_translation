@@ -10,6 +10,7 @@ use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\PageSelection;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\PreflightPlan;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\SubtreeSelection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 final class SelectionBasketSummaryService
 {
@@ -34,8 +35,8 @@ final class SelectionBasketSummaryService
                 'type' => 'page',
                 'uid' => $page->pageUid,
                 'label' => sprintf('#%d %s', $page->pageUid, $this->pageTitle($pageRow)),
-                'scope' => 'Only this page',
-                'meta' => sprintf('1 page record, %d content element%s', $elementCount, $elementCount === 1 ? '' : 's'),
+                'scope' => $this->translate('scope.pageOnly'),
+                'meta' => sprintf($this->translate($elementCount === 1 ? 'summary.onePageOneElementPattern' : 'summary.onePageElementsPattern'), $elementCount),
                 'value' => (string)$page->pageUid,
             ];
         }
@@ -46,8 +47,8 @@ final class SelectionBasketSummaryService
                 'type' => 'subtree',
                 'uid' => $subtree->rootPageUid,
                 'label' => sprintf('#%d %s', $subtree->rootPageUid, $this->pageTitle($pageRow)),
-                'scope' => 'Recursive branch',
-                'meta' => sprintf('%d page%s, %d content element%s', $scopeCounts['pages'], $scopeCounts['pages'] === 1 ? '' : 's', $scopeCounts['elements'], $scopeCounts['elements'] === 1 ? '' : 's'),
+                'scope' => $this->translate('scope.branchChildren'),
+                'meta' => sprintf($this->translate('summary.scopeCountsPattern'), $scopeCounts['pages'], $scopeCounts['elements']),
                 'value' => (string)$subtree->rootPageUid,
             ];
         }
@@ -59,8 +60,8 @@ final class SelectionBasketSummaryService
                 'type' => 'element',
                 'uid' => $element->contentUid,
                 'label' => sprintf('#%d %s', $element->contentUid, $this->contentTitle($elementRow)),
-                'scope' => 'Element only',
-                'meta' => $pageUid > 0 ? sprintf('On page #%d %s', $pageUid, $this->pageTitle($pageRow)) : 'Single content element',
+                'scope' => $this->translate('scope.elementOnly'),
+                'meta' => $pageUid > 0 ? sprintf($this->translate('summary.onPagePattern'), $pageUid, $this->pageTitle($pageRow)) : $this->translate('summary.singleContentElement'),
                 'value' => $element->contentUid . ':' . $element->sourcePageUid,
             ];
         }
@@ -98,14 +99,76 @@ final class SelectionBasketSummaryService
         }
 
         $rows = array_merge($groups['pages'], $groups['subtrees'], $groups['elements']);
+        $pendingFields = $plan instanceof PreflightPlan ? $this->pendingFields($plan) : [];
 
         return [
             'rows' => $rows,
             'groups' => $groups,
             'counts' => $counts,
+            'pendingFields' => $pendingFields,
+            'pendingFieldGroups' => $this->groupPendingFields($pendingFields),
             'isEmpty' => $rows === [],
             'hasPreflight' => $plan instanceof PreflightPlan,
         ];
+    }
+
+    /**
+     * @return array<int, array<string, string|int>>
+     */
+    private function pendingFields(PreflightPlan $plan): array
+    {
+        $fields = [];
+        foreach ($plan->items as $item) {
+            foreach ($item->writableFieldOperations() as $operation) {
+                $recordType = $item->itemType === 'page' ? $this->translate('label.page') : $this->translate('label.element');
+                $fields[] = [
+                    'recordType' => $recordType,
+                    'recordUid' => $item->effectiveBaseUid(),
+                    'recordLabel' => sprintf($this->translate('summary.recordLabelPattern'), $recordType, $item->effectiveBaseUid(), $item->label),
+                    'field' => $operation->field,
+                    'fieldLabel' => $operation->label !== '' ? $operation->label : $operation->field,
+                    'writeAction' => $operation->writeAction,
+                    'actionLabelKey' => $this->actionLabelKey($operation->writeAction),
+                    'sourcePreview' => $this->preview($operation->sourceValue),
+                ];
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param array<int, array<string, string|int>> $pendingFields
+     * @return array<int, array{recordLabel: string, fields: array<int, array<string, string|int>>, fieldCount: int}>
+     */
+    private function groupPendingFields(array $pendingFields): array
+    {
+        $groups = [];
+        foreach ($pendingFields as $field) {
+            $recordLabel = (string)($field['recordLabel'] ?? '');
+            if ($recordLabel === '') {
+                continue;
+            }
+            $groups[$recordLabel]['recordLabel'] = $recordLabel;
+            $groups[$recordLabel]['fields'][] = $field;
+        }
+
+        foreach ($groups as $recordLabel => $group) {
+            $groups[$recordLabel]['fieldCount'] = count($group['fields']);
+        }
+
+        return array_values($groups);
+    }
+
+    private function actionLabelKey(string $writeAction): string
+    {
+        $key = match ($writeAction) {
+            'fill_empty' => 'label.operationFillEmpty',
+            'overwrite' => 'label.operationOverwrite',
+            default => 'label.operationWillWrite',
+        };
+
+        return 'LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:' . $key;
     }
 
     private function fetchPage(int $uid): ?array
@@ -144,13 +207,13 @@ final class SelectionBasketSummaryService
     {
         $title = trim((string)($page['title'] ?? ''));
 
-        return $title !== '' ? $title : 'Untitled page';
+        return $title !== '' ? $title : $this->translate('label.untitledPage');
     }
 
     private function contentTitle(?array $element): string
     {
         if ($element === null) {
-            return 'Content element';
+            return $this->translate('label.contentElement');
         }
 
         foreach (['header', 'subheader', 'bodytext'] as $field) {
@@ -160,7 +223,19 @@ final class SelectionBasketSummaryService
             }
         }
 
-        return (string)($element['CType'] ?? 'Content element');
+        return (string)($element['CType'] ?? $this->translate('label.contentElement'));
+    }
+
+    private function preview(string $value): string
+    {
+        $value = trim(preg_replace('/\s+/', ' ', strip_tags($value)) ?? '');
+
+        return mb_strlen($value) > 90 ? mb_substr($value, 0, 87) . '...' : $value;
+    }
+
+    private function translate(string $key): string
+    {
+        return LocalizationUtility::translate($key, 'ppl_deepl_v3_batch_translation') ?? $key;
     }
 
     private function countPageContentElements(int $pageUid): int

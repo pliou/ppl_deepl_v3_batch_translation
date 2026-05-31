@@ -8,12 +8,14 @@ use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\BatchSelection;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 final class BatchPageTreeService
 {
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly RecordLocalizationService $localizationService,
+        private readonly BatchRecordMappingService $recordMappingService,
         private readonly TranslationFieldDefinitionService $fieldDefinitionService
     ) {}
 
@@ -37,10 +39,10 @@ final class BatchPageTreeService
         $startUid = $rootPageUid > 0 ? $rootPageUid : 0;
 
         if ($rootPageUid > 0 && isset($pages[$rootPageUid])) {
-            $this->appendTreeRow($rows, $pages[$rootPageUid], $children, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, 0, $search, $statusFilter);
+            $this->appendTreeRow($rows, $pages[$rootPageUid], $children, $selection, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, 0, $search, $statusFilter);
         } else {
             foreach ($children[$startUid] ?? [] as $index => $page) {
-                $this->appendTreeRow($rows, $page, $children, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, 0, $search, $statusFilter);
+                $this->appendTreeRow($rows, $page, $children, $selection, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, 0, $search, $statusFilter);
             }
         }
 
@@ -77,7 +79,7 @@ final class BatchPageTreeService
         return [
             'label' => $siteLabel,
             'rootPageId' => $rootPageUid,
-            'rootTitle' => trim((string)($pages[$rootPageUid]['title'] ?? '')) ?: 'Root page',
+            'rootTitle' => trim((string)($pages[$rootPageUid]['title'] ?? '')) ?: $this->translate('site.root'),
             'pageCount' => $pageCount,
             'hint' => 'Only pages below the selected site root are shown.',
         ];
@@ -86,7 +88,7 @@ final class BatchPageTreeService
     /**
      * @return array<string, mixed>
      */
-    public function getPageDetails(int $pageUid, int $targetLanguageId, int $rootPageUid = 0): array
+    public function getPageDetails(int $pageUid, int $sourceLanguageId, int $targetLanguageId, int $rootPageUid = 0): array
     {
         if ($pageUid <= 0) {
             return [
@@ -105,6 +107,9 @@ final class BatchPageTreeService
             ];
         }
 
+        $sourceMapping = $this->recordMappingService->resolveSourceRecord('pages', $pageUid, $sourceLanguageId);
+        $sourcePage = is_array($sourceMapping['source']) ? $sourceMapping['source'] : $page;
+        $sourceMissing = (bool)$sourceMapping['sourceMissing'];
         $targetUid = $this->localizationService->findLocalizedRecordUid('pages', $pageUid, $targetLanguageId);
         $targetPage = $targetUid > 0 ? $this->fetchRecord('pages', $targetUid) : null;
         $pageFields = [];
@@ -114,11 +119,11 @@ final class BatchPageTreeService
             $children[(int)$row['pid']][] = $row;
         }
         $outlineNumbers = $this->outlineNumbers($pages, $children, $rootPageUid);
-        $elements = $this->getContentElementRows($pageUid, $targetLanguageId);
+        $elements = $this->getContentElementRows($pageUid, $sourceLanguageId, $targetLanguageId);
         $blockedElements = array_filter($elements, static fn(array $element): bool => (bool)($element['blocked'] ?? false));
 
         foreach ($this->fieldDefinitionService->getDefinitions('pages') as $definition) {
-            $sourceValue = trim((string)($page[$definition->field] ?? ''));
+            $sourceValue = $sourceMissing ? '' : trim((string)($sourcePage[$definition->field] ?? ''));
             $targetValue = trim((string)($targetPage[$definition->field] ?? ''));
             if ($sourceValue === '' && $targetValue === '') {
                 continue;
@@ -134,23 +139,26 @@ final class BatchPageTreeService
         }
 
         $blockReasons = $this->pageBlockReasons($page, $targetLanguageId);
+        if ($sourceMissing) {
+            $blockReasons[] = $this->translate('permission.sourceLanguageRecordMissing');
+        }
 
         return [
             'page' => [
                 'uid' => (int)$page['uid'],
-                'title' => (string)($page['title'] ?? ''),
+                'title' => (string)($sourcePage['title'] ?? $page['title'] ?? ''),
                 'hierarchy' => (string)($outlineNumbers[(int)$page['uid']] ?? ''),
                 'targetUid' => $targetUid,
                 'targetState' => $targetUid > 0 ? 'exists' : 'missing',
                 'hasCurrentTranslation' => $targetPage !== null && $this->hasCurrentValues('pages', $targetPage),
                 'status' => $blockReasons !== []
-                    ? 'blocked'
-                    : $this->statusForPageWithElements($page, $targetPage, $elements),
+                    ? ($sourceMissing ? 'source_missing' : 'blocked')
+                    : $this->statusForPageWithElements($sourcePage, $targetPage, $elements),
                 'blockReasons' => $blockReasons,
                 'elementCount' => count($elements),
                 'selectableElementCount' => count($elements) - count($blockedElements),
                 'blockedElementCount' => count($blockedElements),
-                'permissionSummary' => $blockReasons === [] ? 'Writable' : implode(' ', $blockReasons),
+                'permissionSummary' => $blockReasons === [] ? $this->translate('label.writable') : implode(' ', $blockReasons),
             ],
             'pageFields' => $pageFields,
             'elements' => $elements,
@@ -194,26 +202,35 @@ final class BatchPageTreeService
      * @param array<int, bool> $selectedElementPages
      * @param array<int, string> $outlineNumbers
      */
-    private function appendTreeRow(array &$rows, array $page, array $children, int $targetLanguageId, array $selectedPages, array $selectedSubtrees, array $excludedPages, array $selectedElementPages, array $outlineNumbers, int $depth, string $search, string $statusFilter): void
+    private function appendTreeRow(array &$rows, array $page, array $children, BatchSelection $selection, int $targetLanguageId, array $selectedPages, array $selectedSubtrees, array $excludedPages, array $selectedElementPages, array $outlineNumbers, int $depth, string $search, string $statusFilter): void
     {
         $uid = (int)$page['uid'];
+        $sourceMapping = $this->recordMappingService->resolveSourceRecord('pages', $uid, $selection->sourceLanguageId);
+        $sourcePage = is_array($sourceMapping['source']) ? $sourceMapping['source'] : $page;
+        $sourceMissing = (bool)$sourceMapping['sourceMissing'];
         $targetUid = $this->localizationService->findLocalizedRecordUid('pages', $uid, $targetLanguageId);
         $targetPage = $targetUid > 0 ? $this->fetchRecord('pages', $targetUid) : null;
         $blockReasons = $this->pageBlockReasons($page, $targetLanguageId);
-        $elements = $this->getContentElementRows($uid, $targetLanguageId);
+        if ($sourceMissing) {
+            $blockReasons[] = $this->translate('permission.sourceLanguageRecordMissing');
+        }
+        $elements = $this->getContentElementRows($uid, $selection->sourceLanguageId, $targetLanguageId);
         $status = $blockReasons !== []
-            ? 'blocked'
-            : $this->statusForPageWithElements($page, $targetPage, $elements);
+            ? ($sourceMissing ? 'source_missing' : 'blocked')
+            : $this->statusForPageWithElements($sourcePage, $targetPage, $elements);
         $contentCount = count($elements);
         $targetContentCount = count(array_filter($elements, static fn(array $element): bool => (int)($element['targetUid'] ?? 0) > 0));
         $branchPageCount = $this->countBranchPages($uid, $children);
         $branchContentCount = $this->countBranchContentElements($uid, $children);
         $selected = isset($selectedPages[$uid]) || isset($selectedSubtrees[$uid]) || isset($selectedElementPages[$uid]);
         $excluded = isset($excludedPages[$uid]);
+        $searchText = mb_strtolower(trim((string)($page['title'] ?? '') . ' ' . (string)($sourcePage['title'] ?? '') . ' ' . $this->contentSearchTextFromRows($elements)));
+        $contentMatchesSearch = $search !== '' && str_contains($searchText, mb_strtolower($search));
         $matchesSearch = $search === ''
             || str_contains((string)$uid, $search)
             || str_contains(mb_strtolower((string)($page['title'] ?? '')), mb_strtolower($search))
-            || $this->pageContentMatchesSearch($uid, $search);
+            || str_contains(mb_strtolower((string)($sourcePage['title'] ?? '')), mb_strtolower($search))
+            || $contentMatchesSearch;
         $matchesStatus = match ($statusFilter) {
             '', 'all' => true,
             'selected' => $selected,
@@ -226,6 +243,7 @@ final class BatchPageTreeService
                 'uid' => $uid,
                 'pid' => (int)$page['pid'],
                 'title' => (string)($page['title'] ?? ''),
+                'sourceTitle' => (string)($sourcePage['title'] ?? ''),
                 'hierarchy' => (string)($outlineNumbers[$uid] ?? ''),
                 'depth' => $depth,
                 'status' => $status,
@@ -237,23 +255,27 @@ final class BatchPageTreeService
                 'childrenCount' => count($children[$uid] ?? []),
                 'branchPageCount' => $branchPageCount,
                 'branchContentCount' => $branchContentCount,
+                'branchMeta' => sprintf($this->translate('summary.scopeCountsPattern'), $branchPageCount, $branchContentCount),
+                'pageMeta' => sprintf($this->translate('summary.scopeCountsPattern'), 1, $contentCount),
                 'selectedPage' => isset($selectedPages[$uid]),
                 'selectedSubtree' => isset($selectedSubtrees[$uid]),
                 'selected' => $selected,
                 'excluded' => $excluded,
                 'blockReasons' => $blockReasons,
+                'searchText' => $searchText,
+                'searchHit' => $contentMatchesSearch,
             ];
         }
 
         foreach ($children[$uid] ?? [] as $child) {
-            $this->appendTreeRow($rows, $child, $children, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, $depth + 1, $search, $statusFilter);
+            $this->appendTreeRow($rows, $child, $children, $selection, $targetLanguageId, $selectedPages, $selectedSubtrees, $excludedPages, $selectedElementPages, $outlineNumbers, $depth + 1, $search, $statusFilter);
         }
     }
 
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getContentElementRows(int $pageUid, int $targetLanguageId): array
+    private function getContentElementRows(int $pageUid, int $sourceLanguageId, int $targetLanguageId): array
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
@@ -272,13 +294,20 @@ final class BatchPageTreeService
 
         $rows = [];
         foreach ($elements as $index => $element) {
+            $sourceMapping = $this->recordMappingService->resolveSourceRecord('tt_content', (int)$element['uid'], $sourceLanguageId);
+            $sourceElement = is_array($sourceMapping['source']) ? $sourceMapping['source'] : $element;
+            $sourceMissing = (bool)$sourceMapping['sourceMissing'];
             $targetUid = $this->localizationService->findLocalizedRecordUid('tt_content', (int)$element['uid'], $targetLanguageId);
             $target = $targetUid > 0 ? $this->fetchRecord('tt_content', $targetUid) : null;
             $blockReasons = $this->contentBlockReasons($element, $targetLanguageId);
-            $title = $this->contentTitle($element);
-            $preview = $this->contentPreview($element);
+            if ($sourceMissing) {
+                $blockReasons[] = $this->translate('permission.sourceLanguageRecordMissing');
+            }
+            $title = $this->contentTitle($sourceElement);
+            $preview = $this->contentPreview($sourceElement);
             $rows[] = [
                 'uid' => (int)$element['uid'],
+                'sourceUid' => (int)$sourceMapping['sourceUid'],
                 'pid' => (int)$element['pid'],
                 'hierarchy' => 'e' . ($index + 1),
                 'ctype' => (string)($element['CType'] ?? ''),
@@ -286,16 +315,17 @@ final class BatchPageTreeService
                 'title' => mb_substr($title, 0, 50),
                 'fullTitle' => $title,
                 'preview' => $blockReasons === [] ? $preview : '',
+                'searchText' => $this->contentSearchText($sourceElement),
                 'targetUid' => $targetUid,
                 'targetState' => $targetUid > 0 ? 'exists' : 'missing',
                 'hasCurrentTranslation' => $target !== null && $this->hasCurrentValues('tt_content', $target),
-                'currentOperations' => $this->currentOperationsForRecord('tt_content', $element, $target),
-                'status' => $blockReasons !== [] ? 'blocked' : $this->statusForRecord('tt_content', $element, $target),
+                'currentOperations' => $sourceMissing ? [] : $this->currentOperationsForRecord('tt_content', $sourceElement, $target),
+                'status' => $blockReasons !== [] ? ($sourceMissing ? 'source_missing' : 'blocked') : $this->statusForRecord('tt_content', $sourceElement, $target),
                 'fieldCount' => count($this->fieldDefinitionService->getDefinitions('tt_content')),
                 'blocked' => $blockReasons !== [],
                 'selectable' => $blockReasons === [],
                 'blockReasons' => $blockReasons,
-                'permissionSummary' => $blockReasons === [] ? 'Writable' : implode(' ', $blockReasons),
+                'permissionSummary' => $blockReasons === [] ? $this->translate('label.writable') : implode(' ', $blockReasons),
             ];
         }
 
@@ -338,7 +368,7 @@ final class BatchPageTreeService
                 'targetValue' => $targetValue,
                 'translatedValue' => '',
                 'writeAction' => $targetValue === '' || $looksUntranslated ? 'missing_current' : 'existing_current',
-                'actionLabel' => $targetValue === '' || $looksUntranslated ? 'not translated' : 'existing',
+                'actionLabel' => $targetValue === '' || $looksUntranslated ? $this->translate('label.notTranslated') : $this->translate('label.existing'),
                 'hasCurrent' => $targetValue !== '',
                 'hasProposal' => false,
             ];
@@ -509,7 +539,7 @@ final class BatchPageTreeService
             }
         }
 
-        return (string)($element['CType'] ?? 'Content element');
+        return (string)($element['CType'] ?? $this->translate('label.contentElement'));
     }
 
     private function contentPreview(array $element): string
@@ -541,15 +571,15 @@ final class BatchPageTreeService
 
         $reasons = [];
         if (method_exists($backendUser, 'check') && !$backendUser->check('tables_modify', 'pages')) {
-            $reasons[] = 'Missing pages modify permission.';
+            $reasons[] = $this->translate('permission.missingPagesModify');
         }
         if (method_exists($backendUser, 'checkLanguageAccess') && !$backendUser->checkLanguageAccess($targetLanguageId)) {
-            $reasons[] = sprintf('User cannot access target language %d.', $targetLanguageId);
+            $reasons[] = sprintf($this->translate('permission.noTargetLanguageAccess'), $targetLanguageId);
         }
         if (method_exists($backendUser, 'doesUserHaveAccess')
             && !$backendUser->doesUserHaveAccess($page, Permission::PAGE_EDIT)
         ) {
-            $reasons[] = 'Missing page edit permission.';
+            $reasons[] = $this->translate('permission.missingPageEdit');
         }
 
         return $reasons;
@@ -567,17 +597,17 @@ final class BatchPageTreeService
 
         $reasons = [];
         if (method_exists($backendUser, 'check') && !$backendUser->check('tables_modify', 'tt_content')) {
-            $reasons[] = 'Missing tt_content modify permission.';
+            $reasons[] = $this->translate('permission.missingContentModify');
         }
         if (method_exists($backendUser, 'checkLanguageAccess') && !$backendUser->checkLanguageAccess($targetLanguageId)) {
-            $reasons[] = sprintf('User cannot access target language %d.', $targetLanguageId);
+            $reasons[] = sprintf($this->translate('permission.noTargetLanguageAccess'), $targetLanguageId);
         }
         $page = $this->fetchRecord('pages', (int)($element['pid'] ?? 0));
         if ($page !== null
             && method_exists($backendUser, 'doesUserHaveAccess')
             && !$backendUser->doesUserHaveAccess($page, Permission::CONTENT_EDIT)
         ) {
-            $reasons[] = 'Missing content edit permission on parent page.';
+            $reasons[] = $this->translate('permission.missingParentContentEdit');
         }
 
         return $reasons;
@@ -642,32 +672,37 @@ final class BatchPageTreeService
         return $count;
     }
 
-    private function pageContentMatchesSearch(int $pageUid, string $search): bool
+    /**
+     * @param array<int, array<string, mixed>> $elements
+     */
+    private function contentSearchTextFromRows(array $elements): string
     {
-        $search = trim($search);
-        if ($search === '') {
-            return true;
+        $parts = [];
+        foreach ($elements as $element) {
+            $value = trim((string)($element['searchText'] ?? ''));
+            if ($value !== '') {
+                $parts[] = $value;
+            }
         }
 
-        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
-        $queryBuilder->getRestrictions()->removeAll();
-        $like = '%' . $queryBuilder->escapeLikeWildcards($search) . '%';
+        return implode(' ', $parts);
+    }
 
-        return (int)$queryBuilder
-            ->count('uid')
-            ->from('tt_content')
-            ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pageUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->or(
-                    $queryBuilder->expr()->like('header', $queryBuilder->createNamedParameter($like)),
-                    $queryBuilder->expr()->like('subheader', $queryBuilder->createNamedParameter($like)),
-                    $queryBuilder->expr()->like('bodytext', $queryBuilder->createNamedParameter($like))
-                )
-            )
-            ->setMaxResults(1)
-            ->executeQuery()
-            ->fetchOne() > 0;
+    private function contentSearchText(array $element): string
+    {
+        $parts = [];
+        foreach (['header', 'subheader', 'bodytext'] as $field) {
+            $value = trim(preg_replace('/\s+/', ' ', strip_tags((string)($element[$field] ?? ''))) ?? '');
+            if ($value !== '') {
+                $parts[] = $value;
+            }
+        }
+
+        return implode(' ', $parts);
+    }
+
+    private function translate(string $key): string
+    {
+        return LocalizationUtility::translate($key, 'ppl_deepl_v3_batch_translation') ?? $key;
     }
 }

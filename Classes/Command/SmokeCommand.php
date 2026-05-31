@@ -35,6 +35,7 @@ final class SmokeCommand extends Command
             ->addOption('run-matrix', null, InputOption::VALUE_NONE, 'Run the smoke matrix after preparing the fixture.')
             ->addOption('case', null, InputOption::VALUE_REQUIRED, 'Run only one case id, for example BT-SMOKE-002.')
             ->addOption('keep-fixture', null, InputOption::VALUE_NONE, 'Reuse fixture-uids.json from the artifact root when present.')
+            ->addOption('keep-fake-active', null, InputOption::VALUE_NONE, 'Keep Fake DeepL active after fixture preparation. Development/Testing context only.')
             ->addOption('artifact-root', null, InputOption::VALUE_REQUIRED, 'Artifact root path. Defaults to var/smoke/batch-translation/<timestamp>.')
             ->addOption('deactivate-fake', null, InputOption::VALUE_NONE, 'Deactivate the persistent Fake DeepL smoke context and exit.');
     }
@@ -89,6 +90,11 @@ final class SmokeCommand extends Command
                 $this->context->deactivate();
                 $output->writeln('<info>Smoke Fake DeepL context deactivated.</info>');
             }
+        }
+
+        if (!(bool)$input->getOption('keep-fake-active')) {
+            $this->context->deactivate();
+            $output->writeln('<info>Smoke Fake DeepL context deactivated.</info>');
         }
 
         $output->writeln('<comment>Fixture prepared. Pass --run-matrix to execute smoke cases.</comment>');

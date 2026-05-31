@@ -7,5 +7,6 @@ TYPO3 backend workspace for controlled batch translation of `pages` and `tt_cont
 Before changing the workspace UI, read:
 
 - [Batch Translation UX Regression Notes](Documentation/ux-regression-notes.md)
+- [Production Hardening Notes](Documentation/production-hardening.md)
 
 That file documents decisions that should not be silently reverted, including selection preset placement, existing translation display, preview/write separation, visibility handling, and localized slug regeneration.

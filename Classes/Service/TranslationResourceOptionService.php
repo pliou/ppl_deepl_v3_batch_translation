@@ -34,11 +34,17 @@ final class TranslationResourceOptionService
 
     public function normalizeTargetLanguage(string $language): string
     {
-        return match (strtoupper(str_replace('_', '-', trim($language)))) {
-            'EN' => 'EN-GB',
-            'PT' => 'PT-PT',
-            'DE-DE' => 'DE',
-            default => strtoupper(str_replace('_', '-', trim($language))),
+        $language = strtoupper(str_replace('_', '-', trim($language)));
+
+        return match (true) {
+            $language === 'EN' => 'EN-GB',
+            $language === 'PT' => 'PT-PT',
+            $language === 'DE-DE' => 'DE',
+            str_starts_with($language, 'EN-') => $language,
+            str_starts_with($language, 'PT-') => $language,
+            $language === 'ZH-HANS' || $language === 'ZH-HANT' => 'ZH',
+            str_contains($language, '-') => explode('-', $language, 2)[0],
+            default => $language,
         };
     }
 

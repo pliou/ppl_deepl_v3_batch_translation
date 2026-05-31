@@ -12,7 +12,7 @@ final class SmokeContext
 
     public function isActive(): bool
     {
-        return $this->envEnabled() || $this->readContext() !== [];
+        return $this->canUseSmokeProvider() && ($this->envEnabled() || $this->readContext() !== []);
     }
 
     public function artifactRoot(): string
@@ -33,6 +33,10 @@ final class SmokeContext
 
     public function activate(string $artifactRoot): void
     {
+        if (!$this->canUseSmokeProvider()) {
+            throw new \RuntimeException('Fake DeepL smoke context is only allowed in TYPO3 Development or Testing context.');
+        }
+
         $path = $this->contextFilePath();
         $directory = dirname($path);
         if (!is_dir($directory)) {
@@ -62,6 +66,13 @@ final class SmokeContext
     private function envEnabled(): bool
     {
         return in_array(strtolower(trim((string)getenv('PPL_BATCH_TRANSLATION_SMOKE'))), ['1', 'true', 'yes'], true);
+    }
+
+    private function canUseSmokeProvider(): bool
+    {
+        $context = Environment::getContext();
+
+        return $context->isDevelopment() || $context->isTesting();
     }
 
     /**

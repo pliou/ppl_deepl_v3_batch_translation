@@ -67,14 +67,20 @@ final class PreflightPlan
                 $counts['blocked']++;
                 continue;
             }
+
+            $writableOperations = $item->writableFieldOperations();
             if ($item->recordAction === 'create') {
                 $counts['createRecords']++;
             } elseif ($item->recordAction === 'update') {
-                $counts['updateRecords']++;
+                if ($writableOperations !== []) {
+                    $counts['updateRecords']++;
+                } else {
+                    $counts['skipped']++;
+                }
             } elseif ($item->recordAction === 'skip') {
                 $counts['skipped']++;
             }
-            foreach ($item->fieldOperations as $operation) {
+            foreach ($writableOperations as $operation) {
                 $counts['fields']++;
                 if ($operation->writeAction === 'overwrite') {
                     $counts['overwrites']++;
@@ -82,8 +88,6 @@ final class PreflightPlan
                     $counts['fills']++;
                 } elseif ($operation->writeAction === 'translate') {
                     $counts['translations']++;
-                } elseif ($operation->writeAction === 'skip') {
-                    $counts['skipped']++;
                 }
                 if ($operation->needsTranslation()) {
                     $counts['characters'] += mb_strlen($operation->sourceValue);

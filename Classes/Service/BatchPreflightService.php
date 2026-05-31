@@ -7,20 +7,19 @@ namespace Ppl\PplDeeplV3BatchTranslation\Service;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\BatchSelection;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\FieldDefinition;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\FieldOperation;
-use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\PermissionResult;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\PreflightItem;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\PreflightPlan;
 use Ppl\PplDeeplV3BatchTranslation\Domain\Enum\TranslationMode;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Type\Bitmask\Permission;
 
 final class BatchPreflightService
 {
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly RecordLocalizationService $localizationService,
-        private readonly TranslationFieldDefinitionService $fieldDefinitionService
+        private readonly TranslationFieldDefinitionService $fieldDefinitionService,
+        private readonly BatchRecordMappingService $recordMappingService,
+        private readonly BatchPermissionService $permissionService
     ) {}
 
     public function buildPlan(BatchSelection $selection): PreflightPlan
@@ -32,10 +31,6 @@ final class BatchPreflightService
         if ($selection->targetLanguageId === $selection->sourceLanguageId) {
             $messages[] = ['type' => 'error', 'text' => 'Target language must not be the source language.'];
         }
-        if ($selection->sourceLanguageId !== 0) {
-            $messages[] = ['type' => 'warning', 'text' => 'P0 expects default-language source records. Non-default source language is not executed.'];
-        }
-
         $records = $this->resolveSelectedRecords($selection);
         $items = [];
         foreach ($records as $record) {
@@ -46,7 +41,7 @@ final class BatchPreflightService
     }
 
     /**
-     * @return array<int, array{table: string, uid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>}>
+     * @return array<int, array{table: string, baseUid: int, sourceUid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>, baseRow: array<string, mixed>, sourceMissing: bool}>
      */
     private function resolveSelectedRecords(BatchSelection $selection): array
     {
@@ -59,13 +54,13 @@ final class BatchPreflightService
             }
             $page = $this->fetchRecord('pages', $pageSelection->pageUid);
             if ($page !== null) {
-                $this->appendRecord($records, $seen, 'pages', $pageSelection->pageUid, $pageSelection->pageUid, 'page', $page);
+                $this->appendMappedRecord($records, $seen, $selection, 'pages', $pageSelection->pageUid, $pageSelection->pageUid, 'page');
                 if ($pageSelection->includeElements) {
                     foreach ($this->fetchPageContentElements($pageSelection->pageUid) as $element) {
                         if ($selection->hasExcludedElement((int)$element['uid'])) {
                             continue;
                         }
-                        $this->appendRecord($records, $seen, 'tt_content', (int)$element['uid'], (int)$element['pid'], 'element', $element);
+                        $this->appendMappedRecord($records, $seen, $selection, 'tt_content', (int)$element['uid'], (int)$element['pid'], 'element');
                     }
                 }
             }
@@ -77,13 +72,13 @@ final class BatchPreflightService
                 if ($selection->hasExcludedPage($pageUid)) {
                     continue;
                 }
-                $this->appendRecord($records, $seen, 'pages', $pageUid, $pageUid, 'page', $page);
+                $this->appendMappedRecord($records, $seen, $selection, 'pages', $pageUid, $pageUid, 'page');
                 if ($subtreeSelection->includeElements) {
                     foreach ($this->fetchPageContentElements($pageUid) as $element) {
                         if ($selection->hasExcludedElement((int)$element['uid'])) {
                             continue;
                         }
-                        $this->appendRecord($records, $seen, 'tt_content', (int)$element['uid'], (int)$element['pid'], 'element', $element);
+                        $this->appendMappedRecord($records, $seen, $selection, 'tt_content', (int)$element['uid'], (int)$element['pid'], 'element');
                     }
                 }
             }
@@ -98,7 +93,7 @@ final class BatchPreflightService
                 if ($selection->hasExcludedPage((int)$element['pid'])) {
                     continue;
                 }
-                $this->appendRecord($records, $seen, 'tt_content', $elementSelection->contentUid, (int)$element['pid'], 'element', $element);
+                $this->appendMappedRecord($records, $seen, $selection, 'tt_content', $elementSelection->contentUid, (int)$element['pid'], 'element');
             }
         }
 
@@ -106,49 +101,59 @@ final class BatchPreflightService
     }
 
     /**
-     * @param array<int, array{table: string, uid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>}> $records
+     * @param array<int, array{table: string, baseUid: int, sourceUid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>, baseRow: array<string, mixed>, sourceMissing: bool}> $records
      * @param array<string, bool> $seen
-     * @param array<string, mixed> $row
      */
-    private function appendRecord(array &$records, array &$seen, string $table, int $uid, int $sourcePageUid, string $itemType, array $row): void
+    private function appendMappedRecord(array &$records, array &$seen, BatchSelection $selection, string $table, int $baseUid, int $sourcePageUid, string $itemType): void
     {
-        $key = $table . ':' . $uid;
+        $key = $table . ':' . $baseUid;
         if (isset($seen[$key])) {
+            return;
+        }
+
+        $mapping = $this->recordMappingService->resolveSourceRecord($table, $baseUid, $selection->sourceLanguageId);
+        if (!is_array($mapping['base'])) {
             return;
         }
 
         $seen[$key] = true;
         $records[] = [
             'table' => $table,
-            'uid' => $uid,
+            'baseUid' => $baseUid,
+            'sourceUid' => (int)$mapping['sourceUid'],
             'sourcePageUid' => $sourcePageUid,
             'itemType' => $itemType,
-            'row' => $row,
+            'row' => is_array($mapping['source']) ? $mapping['source'] : $mapping['base'],
+            'baseRow' => $mapping['base'],
+            'sourceMissing' => (bool)$mapping['sourceMissing'],
         ];
     }
 
     /**
-     * @param array{table: string, uid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>} $record
+     * @param array{table: string, baseUid: int, sourceUid: int, sourcePageUid: int, itemType: string, row: array<string, mixed>, baseRow: array<string, mixed>, sourceMissing: bool} $record
      */
     private function buildItem(BatchSelection $selection, array $record): PreflightItem
     {
         $table = $record['table'];
-        $sourceUid = $record['uid'];
-        $targetUid = $this->localizationService->findLocalizedRecordUid($table, $sourceUid, $selection->targetLanguageId);
+        $baseUid = $record['baseUid'];
+        $sourceUid = $record['sourceUid'];
+        $targetUid = $this->localizationService->findLocalizedRecordUid($table, $baseUid, $selection->targetLanguageId);
         $targetRecord = $targetUid > 0 ? $this->fetchRecord($table, $targetUid) : null;
-        $permission = $this->checkPermissions($table, $record['row'], $record['sourcePageUid'], $selection->targetLanguageId);
-        $errors = $this->validateSourceRecord($record['row'], $selection);
-        $status = $this->statusForRecord($table, $record['row'], $targetRecord);
+        $permission = $this->permissionService->checkRecordAccess($table, $record['baseRow'], $record['sourcePageUid'], $selection->targetLanguageId);
+        $errors = $this->validateSourceRecord($record['row'], $selection, (bool)$record['sourceMissing']);
+        $status = $record['sourceMissing'] ? 'source_missing' : $this->statusForRecord($table, $record['row'], $targetRecord);
 
         if (!$permission->allowed) {
             $status = 'blocked';
         }
 
         $recordAction = $this->recordAction($selection->mode, $targetUid);
-        $fieldOperations = $this->buildFieldOperations($selection->mode, $table, $record['row'], $targetRecord, $targetUid, $record['sourcePageUid']);
+        $fieldOperations = $record['sourceMissing']
+            ? []
+            : $this->buildFieldOperations($selection->mode, $table, $record['row'], $targetRecord, $targetUid, $record['sourcePageUid'], $baseUid);
 
         return new PreflightItem(
-            $table . ':' . $sourceUid,
+            $table . ':' . $baseUid,
             $record['itemType'],
             $table,
             $sourceUid,
@@ -159,16 +164,21 @@ final class BatchPreflightService
             $recordAction,
             $permission,
             $fieldOperations,
-            $errors
+            $errors,
+            $baseUid
         );
     }
 
     /**
      * @return string[]
      */
-    private function validateSourceRecord(array $row, BatchSelection $selection): array
+    private function validateSourceRecord(array $row, BatchSelection $selection, bool $sourceMissing): array
     {
         $errors = [];
+        if ($sourceMissing) {
+            $errors[] = 'Selected source language record is missing.';
+            return $errors;
+        }
         if ((int)($row['sys_language_uid'] ?? 0) !== $selection->sourceLanguageId) {
             $errors[] = 'Selected record is not in the requested source language.';
         }
@@ -195,7 +205,7 @@ final class BatchPreflightService
     /**
      * @return FieldOperation[]
      */
-    private function buildFieldOperations(TranslationMode $mode, string $table, array $sourceRecord, ?array $targetRecord, int $targetUid, int $sourcePageUid): array
+    private function buildFieldOperations(TranslationMode $mode, string $table, array $sourceRecord, ?array $targetRecord, int $targetUid, int $sourcePageUid, int $baseUid): array
     {
         if ($mode === TranslationMode::CreateMissingRecordsOnly) {
             return [];
@@ -220,7 +230,7 @@ final class BatchPreflightService
 
             $sourceUid = (int)$sourceRecord['uid'];
             $operations[] = new FieldOperation(
-                $table . ':' . $sourceUid . ':' . $definition->field,
+                $table . ':' . $baseUid . ':' . $definition->field,
                 $table,
                 $sourceUid,
                 $targetUid,
@@ -296,60 +306,6 @@ final class BatchPreflightService
     private function normalizeComparableValue(string $value): string
     {
         return mb_strtolower(trim(preg_replace('/\s+/', ' ', strip_tags($value)) ?? ''));
-    }
-
-    private function checkPermissions(string $table, array $row, int $sourcePageUid, int $targetLanguageId): PermissionResult
-    {
-        $backendUser = $GLOBALS['BE_USER'] ?? null;
-        if (!$backendUser instanceof BackendUserAuthentication) {
-            return PermissionResult::blocked('No backend user is available.');
-        }
-
-        if ($this->isAdmin($backendUser)) {
-            return PermissionResult::allowed();
-        }
-
-        $reasons = [];
-        if (!$this->hasTableModifyPermission($backendUser, $table)) {
-            $reasons[] = sprintf('Missing %s modify permission.', $table);
-        }
-        if (!$this->hasLanguageAccess($backendUser, $targetLanguageId)) {
-            $reasons[] = sprintf('User cannot access target language %d.', $targetLanguageId);
-        }
-
-        $page = $table === 'pages' ? $row : $this->fetchRecord('pages', $sourcePageUid);
-        if ($page === null) {
-            $reasons[] = sprintf('Source page %d was not found.', $sourcePageUid);
-        } else {
-            $permission = $table === 'tt_content' ? Permission::CONTENT_EDIT : Permission::PAGE_EDIT;
-            if (!$this->hasPagePermission($backendUser, $page, $permission)) {
-                $reasons[] = $table === 'tt_content'
-                    ? 'Missing content edit permission on source page.'
-                    : 'Missing page edit permission.';
-            }
-        }
-
-        return $reasons === [] ? PermissionResult::allowed() : PermissionResult::blocked(...$reasons);
-    }
-
-    private function isAdmin(BackendUserAuthentication $backendUser): bool
-    {
-        return !empty($backendUser->user['admin']);
-    }
-
-    private function hasTableModifyPermission(BackendUserAuthentication $backendUser, string $table): bool
-    {
-        return !method_exists($backendUser, 'check') || $backendUser->check('tables_modify', $table);
-    }
-
-    private function hasLanguageAccess(BackendUserAuthentication $backendUser, int $languageId): bool
-    {
-        return !method_exists($backendUser, 'checkLanguageAccess') || $backendUser->checkLanguageAccess($languageId);
-    }
-
-    private function hasPagePermission(BackendUserAuthentication $backendUser, array $page, int $permission): bool
-    {
-        return !method_exists($backendUser, 'doesUserHaveAccess') || $backendUser->doesUserHaveAccess($page, $permission);
     }
 
     /**

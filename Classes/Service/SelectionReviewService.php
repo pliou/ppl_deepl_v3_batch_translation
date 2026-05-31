@@ -6,12 +6,14 @@ namespace Ppl\PplDeeplV3BatchTranslation\Service;
 
 use Ppl\PplDeeplV3BatchTranslation\Domain\Dto\BatchSelection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 final class SelectionReviewService
 {
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly RecordLocalizationService $localizationService,
+        private readonly BatchRecordMappingService $recordMappingService,
         private readonly TranslationFieldDefinitionService $fieldDefinitionService
     ) {}
 
@@ -33,14 +35,16 @@ final class SelectionReviewService
             foreach ($this->subtreePages($pages, $children, $subtree->rootPageUid, $subtree->includeRoot, $subtree->includeHidden) as $page) {
                 $pageUid = (int)$page['uid'];
                 if ($selection->hasExcludedPage($pageUid)) {
-                    $excludedPages[$pageUid] = $this->pageSummary($page, $outlines, 'Excluded from recursive branch');
+                    $excludedPages[$pageUid] = $this->pageSummary($page, $outlines, $this->translate('reason.excludedFromRecursiveBranch'));
                     continue;
                 }
 
                 if (!isset($includedPages[$pageUid])) {
                     $includedPages[$pageUid] = [
                         'origin' => $pageUid === $subtree->rootPageUid ? 'direct' : 'inherited',
-                        'mode' => $pageUid === $subtree->rootPageUid ? 'Recursive branch' : 'Inherited from recursive branch',
+                        'originLabel' => $pageUid === $subtree->rootPageUid ? $this->translate('origin.direct') : $this->translate('origin.inherited'),
+                        'mode' => $pageUid === $subtree->rootPageUid ? 'recursive_branch' : 'inherited_recursive_branch',
+                        'modeLabel' => $pageUid === $subtree->rootPageUid ? $this->translate('scope.branchChildren') : $this->translate('scope.inheritedBranchChildren'),
                         'via' => sprintf('#%d %s', $subtree->rootPageUid, $rootLabel),
                     ];
                 }
@@ -49,12 +53,13 @@ final class SelectionReviewService
                     foreach ($this->fetchPageContentElements($pageUid) as $index => $element) {
                         $contentUid = (int)$element['uid'];
                         if ($selection->hasExcludedElement($contentUid)) {
-                            $excludedElements[$contentUid] = $this->elementSummary($element, $outlines, $index + 1, $targetLanguageId, 'Excluded from recursive branch');
+                            $excludedElements[$contentUid] = $this->elementSummary($element, $outlines, $index + 1, $selection->sourceLanguageId, $targetLanguageId, $this->translate('reason.excludedFromRecursiveBranch'));
                             continue;
                         }
                         $includedElements[$contentUid] ??= [
                             'row' => $element,
                             'origin' => 'inherited',
+                            'originLabel' => $this->translate('origin.inherited'),
                             'via' => sprintf('#%d %s', $subtree->rootPageUid, $rootLabel),
                         ];
                     }
@@ -69,13 +74,15 @@ final class SelectionReviewService
                 continue;
             }
             if ($selection->hasExcludedPage($pageUid)) {
-                $excludedPages[$pageUid] = $this->pageSummary($page, $outlines, 'Excluded');
+                $excludedPages[$pageUid] = $this->pageSummary($page, $outlines, $this->translate('reason.excluded'));
                 continue;
             }
 
             $includedPages[$pageUid] = [
                 'origin' => 'direct',
-                'mode' => 'Only this page',
+                'originLabel' => $this->translate('origin.direct'),
+                'mode' => 'page_only',
+                'modeLabel' => $this->translate('scope.pageOnly'),
                 'via' => '',
             ];
 
@@ -83,12 +90,13 @@ final class SelectionReviewService
                 foreach ($this->fetchPageContentElements($pageUid) as $index => $element) {
                     $contentUid = (int)$element['uid'];
                     if ($selection->hasExcludedElement($contentUid)) {
-                        $excludedElements[$contentUid] = $this->elementSummary($element, $outlines, $index + 1, $targetLanguageId, 'Excluded from only-page selection');
+                        $excludedElements[$contentUid] = $this->elementSummary($element, $outlines, $index + 1, $selection->sourceLanguageId, $targetLanguageId, $this->translate('reason.excludedFromPageOnlySelection'));
                         continue;
                     }
                     $includedElements[$contentUid] ??= [
                         'row' => $element,
                         'origin' => 'inherited',
+                        'originLabel' => $this->translate('origin.inherited'),
                         'via' => sprintf('#%d %s', $pageUid, $this->pageLabel($page)),
                     ];
                 }
@@ -102,20 +110,23 @@ final class SelectionReviewService
             }
             $pageUid = (int)$element['pid'];
             if ($selection->hasExcludedPage($pageUid) || $selection->hasExcludedElement((int)$element['uid'])) {
-                $excludedElements[(int)$element['uid']] = $this->elementSummary($element, $outlines, $this->contentElementPosition($element), $targetLanguageId, 'Excluded');
+                $excludedElements[(int)$element['uid']] = $this->elementSummary($element, $outlines, $this->contentElementPosition($element), $selection->sourceLanguageId, $targetLanguageId, $this->translate('reason.excluded'));
                 continue;
             }
 
             if (!isset($includedPages[$pageUid])) {
                 $includedPages[$pageUid] = [
                     'origin' => 'direct',
-                    'mode' => 'Element-only page context',
+                    'originLabel' => $this->translate('origin.direct'),
+                    'mode' => 'element_page_context',
+                    'modeLabel' => $this->translate('scope.elementPageContext'),
                     'via' => '',
                 ];
             }
             $includedElements[(int)$element['uid']] = [
                 'row' => $element,
                 'origin' => 'direct',
+                'originLabel' => $this->translate('origin.direct'),
                 'via' => '',
             ];
         }
@@ -133,24 +144,30 @@ final class SelectionReviewService
                 if (!isset($includedElements[$contentUid])) {
                     continue;
                 }
-                $summary = $this->elementSummary($element, $outlines, $index + 1, $targetLanguageId, '');
+                $summary = $this->elementSummary($element, $outlines, $index + 1, $selection->sourceLanguageId, $targetLanguageId, '');
                 $summary['origin'] = $includedElements[$contentUid]['origin'];
+                $summary['originLabel'] = $includedElements[$contentUid]['originLabel'];
                 $summary['via'] = $includedElements[$contentUid]['via'];
                 $pageElements[] = $summary;
             }
 
+            $sourcePageMapping = $this->recordMappingService->resolveSourceRecord('pages', $pageUid, $selection->sourceLanguageId);
+            $sourcePage = is_array($sourcePageMapping['source']) ? $sourcePageMapping['source'] : null;
+            $sourcePageMissing = (bool)$sourcePageMapping['sourceMissing'];
             $targetPage = $this->targetRecord('pages', $pageUid, $targetLanguageId);
-            $currentOperations = $this->currentOperationsForRecord('pages', $page, $targetPage);
+            $currentOperations = $sourcePage !== null ? $this->currentOperationsForRecord('pages', $sourcePage, $targetPage) : [];
             $pageStatus = $this->aggregatePageStatus(
-                $this->statusForRecord('pages', $page, $targetPage),
+                $sourcePageMissing ? 'source_missing' : $this->statusForRecord('pages', $sourcePage ?? $page, $targetPage),
                 array_map(static fn(array $element): string => (string)($element['status'] ?? 'missing'), $pageElements)
             );
             $groups[] = [
                 'uid' => $pageUid,
                 'outline' => $outlines[$pageUid] ?? (string)$pageUid,
-                'label' => sprintf('#%d %s', $pageUid, $this->pageLabel($page)),
+                'label' => sprintf('#%d %s', $pageUid, $this->pageLabel($sourcePage ?? $page)),
                 'mode' => $includedPages[$pageUid]['mode'],
+                'modeLabel' => $includedPages[$pageUid]['modeLabel'],
                 'origin' => $includedPages[$pageUid]['origin'],
+                'originLabel' => $includedPages[$pageUid]['originLabel'],
                 'via' => $includedPages[$pageUid]['via'],
                 'status' => $pageStatus,
                 'hasCurrentTranslation' => $currentOperations !== [],
@@ -416,12 +433,18 @@ final class SelectionReviewService
      * @param array<int, string> $outlines
      * @return array<string, mixed>
      */
-    private function elementSummary(array $element, array $outlines, int $position, int $targetLanguageId, string $reason): array
+    private function elementSummary(array $element, array $outlines, int $position, int $sourceLanguageId, int $targetLanguageId, string $reason): array
     {
         $pageUid = (int)$element['pid'];
-        $title = $this->contentTitle($element);
+        $sourceMapping = $this->recordMappingService->resolveSourceRecord('tt_content', (int)$element['uid'], $sourceLanguageId);
+        $sourceElement = is_array($sourceMapping['source']) ? $sourceMapping['source'] : null;
+        $sourceMissing = (bool)$sourceMapping['sourceMissing'];
+        $title = $this->contentTitle($sourceElement ?? $element);
         $targetRecord = $this->targetRecord('tt_content', (int)$element['uid'], $targetLanguageId);
-        $currentOperations = $this->currentOperationsForRecord('tt_content', $element, $targetRecord);
+        $currentOperations = $sourceElement !== null ? $this->currentOperationsForRecord('tt_content', $sourceElement, $targetRecord) : [];
+        if ($sourceMissing && $reason === '') {
+            $reason = $this->translate('permission.sourceLanguageRecordMissing');
+        }
 
         return [
             'type' => 'element',
@@ -431,10 +454,10 @@ final class SelectionReviewService
             'label' => sprintf('#%d %s', (int)$element['uid'], mb_substr($title, 0, 50)),
             'fullTitle' => $title,
             'ctype' => (string)($element['CType'] ?? ''),
-            'status' => $this->statusForRecord('tt_content', $element, $targetRecord),
+            'status' => $sourceMissing ? 'source_missing' : $this->statusForRecord('tt_content', $sourceElement ?? $element, $targetRecord),
             'hasCurrentTranslation' => $currentOperations !== [],
             'currentOperations' => $currentOperations,
-            'preview' => mb_substr($this->contentPreview($element), 0, 150),
+            'preview' => $sourceMissing ? '' : mb_substr($this->contentPreview($sourceElement ?? $element), 0, 150),
             'reason' => $reason,
         ];
     }
@@ -464,7 +487,7 @@ final class SelectionReviewService
                 'targetValue' => $targetValue,
                 'translatedValue' => '',
                 'writeAction' => $targetValue === '' || $looksUntranslated ? 'missing_current' : 'existing_current',
-                'actionLabel' => $targetValue === '' || $looksUntranslated ? 'not translated' : 'existing',
+                'actionLabel' => $targetValue === '' || $looksUntranslated ? $this->translate('label.notTranslated') : $this->translate('label.existing'),
                 'hasCurrent' => $targetValue !== '',
                 'hasProposal' => false,
             ];
@@ -491,13 +514,13 @@ final class SelectionReviewService
 
     private function pageLabel(?array $page): string
     {
-        return trim((string)($page['title'] ?? '')) ?: 'Untitled page';
+        return trim((string)($page['title'] ?? '')) ?: $this->translate('label.untitledPage');
     }
 
     private function contentTitle(?array $element): string
     {
         if ($element === null) {
-            return 'Content element';
+            return $this->translate('label.contentElement');
         }
         foreach (['header', 'subheader', 'bodytext'] as $field) {
             $value = trim(strip_tags((string)($element[$field] ?? '')));
@@ -506,7 +529,7 @@ final class SelectionReviewService
             }
         }
 
-        return (string)($element['CType'] ?? 'Content element');
+        return (string)($element['CType'] ?? $this->translate('label.contentElement'));
     }
 
     private function contentPreview(array $element): string
@@ -531,5 +554,10 @@ final class SelectionReviewService
         }
 
         return 1;
+    }
+
+    private function translate(string $key): string
+    {
+        return LocalizationUtility::translate($key, 'ppl_deepl_v3_batch_translation') ?? $key;
     }
 }

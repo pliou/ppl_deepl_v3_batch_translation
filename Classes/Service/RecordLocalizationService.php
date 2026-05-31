@@ -14,10 +14,11 @@ final class RecordLocalizationService
         private readonly ConnectionPool $connectionPool
     ) {}
 
-    public function ensureLocalizedRecord(string $table, int $sourceUid, int $targetLanguageId): int
+    public function ensureLocalizedRecord(string $table, int $sourceUid, int $targetLanguageId, int $translationSourceUid = 0): int
     {
         $existingUid = $this->findLocalizedRecordUid($table, $sourceUid, $targetLanguageId);
         if ($existingUid > 0) {
+            $this->setTranslationSource($table, $existingUid, $sourceUid, $translationSourceUid);
             return $existingUid;
         }
 
@@ -34,6 +35,7 @@ final class RecordLocalizationService
 
         $existingUid = $this->findLocalizedRecordUid($table, $sourceUid, $targetLanguageId);
         if ($existingUid > 0) {
+            $this->setTranslationSource($table, $existingUid, $sourceUid, $translationSourceUid);
             return $existingUid;
         }
 
@@ -67,5 +69,34 @@ final class RecordLocalizationService
             'tt_content' => 'l18n_parent',
             default => 'l10n_parent',
         });
+    }
+
+    public function translationSourceField(string $table): string
+    {
+        $field = (string)($GLOBALS['TCA'][$table]['ctrl']['translationSource'] ?? '');
+
+        return $field !== '' && isset($GLOBALS['TCA'][$table]['columns'][$field]) ? $field : '';
+    }
+
+    private function setTranslationSource(string $table, int $targetUid, int $baseUid, int $translationSourceUid): void
+    {
+        if ($translationSourceUid <= 0 || $translationSourceUid === $baseUid || $targetUid <= 0) {
+            return;
+        }
+
+        $field = $this->translationSourceField($table);
+        if ($field === '') {
+            return;
+        }
+
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start([
+            $table => [
+                $targetUid => [
+                    $field => $translationSourceUid,
+                ],
+            ],
+        ], []);
+        $dataHandler->process_datamap();
     }
 }

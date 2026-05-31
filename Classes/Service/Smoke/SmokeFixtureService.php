@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ppl\PplDeeplV3BatchTranslation\Service\Smoke;
 
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Configuration\SiteConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -15,6 +16,7 @@ final class SmokeFixtureService
     public const SITE_IDENTIFIER = 'bt_smoke_site';
     public const SITE_TITLE = 'Batch Translation Smoke Site';
     public const TARGET_LANGUAGE_ID = 1;
+    public const THIRD_LANGUAGE_ID = 2;
     public const ADMIN_USERNAME = 'bt_admin';
     public const LIMITED_USERNAME = 'bt_limited';
     public const PASSWORD = 'BatchSmoke123!';
@@ -36,6 +38,7 @@ final class SmokeFixtureService
             'siteIdentifier' => self::SITE_IDENTIFIER,
             'sourceLanguageId' => 0,
             'targetLanguageId' => self::TARGET_LANGUAGE_ID,
+            'thirdLanguageId' => self::THIRD_LANGUAGE_ID,
             'pages' => [],
             'content' => [],
             'backendUsers' => [
@@ -49,18 +52,18 @@ final class SmokeFixtureService
         $this->writeSiteConfiguration($root);
         $this->writeRootTemplate($root, $now);
         $map['pages']['root'] = $root;
-        $batch = $this->insertPage($root, 'Batch Tests', '/batch-tests', 256, $now, 'DE Batch Tests');
-        $team = $this->insertPage($batch, 'Team Notes', '/batch-tests/team-notes', 256, $now, 'DE Team Notes');
-        $launch = $this->insertPage($team, 'Launch Tasks', '/batch-tests/team-notes/launch-tasks', 256, $now);
-        $support = $this->insertPage($team, 'Support Ideas', '/batch-tests/team-notes/support-ideas', 256, $now);
-        $editorial = $this->insertPage($team, 'Editorial Plan', '/batch-tests/team-notes/editorial-plan', 256, $now);
-        $service = $this->insertPage($root, 'Service Desk', '/service-desk', 256, $now);
-        $offers = $this->insertPage($root, 'Local Offers', '/local-offers', 256, $now);
-        $standalone = $this->insertPage($root, 'Standalone Page', '/standalone-page', 256, $now);
-        $blocked = $this->insertPage($root, 'Permission Blocked Area', '/permission-blocked-area', 0, $now);
-        $blockedChild = $this->insertPage($blocked, 'Blocked Child Page', '/permission-blocked-area/blocked-child-page', 0, $now);
-        $existing = $this->insertPage($root, 'Existing Translation Page', '/existing-translation-page', 256, $now);
-        $partial = $this->insertPage($root, 'Partial Translation Page', '/partial-translation-page', 256, $now, 'DE Partial', 'Noch leer fuellen');
+        $batch = $this->insertPage($root, 'Batch-Tests', '/batch-tests', 256, $now, 'Deutscher Smoke Text fuer Batch-Tests');
+        $team = $this->insertPage($batch, 'Teamnotizen', '/batch-tests/team-notes', 256, $now, 'Deutscher Smoke Text fuer Teamnotizen');
+        $launch = $this->insertPage($team, 'Startaufgaben', '/batch-tests/team-notes/launch-tasks', 256, $now);
+        $support = $this->insertPage($team, 'Support-Ideen', '/batch-tests/team-notes/support-ideas', 256, $now);
+        $editorial = $this->insertPage($team, 'Redaktionsplan', '/batch-tests/team-notes/editorial-plan', 256, $now);
+        $service = $this->insertPage($root, 'Servicedesk', '/service-desk', 256, $now);
+        $offers = $this->insertPage($root, 'Lokale Angebote', '/local-offers', 256, $now);
+        $standalone = $this->insertPage($root, 'Einzelseite', '/standalone-page', 256, $now);
+        $blocked = $this->insertPage($root, 'Gesperrter Berechtigungsbereich', '/permission-blocked-area', 0, $now);
+        $blockedChild = $this->insertPage($blocked, 'Gesperrte Unterseite', '/permission-blocked-area/blocked-child-page', 0, $now);
+        $existing = $this->insertPage($root, 'Bestehende Uebersetzungsseite', '/existing-translation-page', 256, $now);
+        $partial = $this->insertPage($root, 'Teilweise Uebersetzungsseite', '/partial-translation-page', 256, $now, 'DE Teilweise', 'Noch leer fuellen');
 
         $map['pages'] += [
             'batchTests' => $batch,
@@ -180,17 +183,53 @@ final class SmokeFixtureService
 
     private function softDeleteExistingFixture(): void
     {
+        $now = time();
         $pageConnection = $this->connectionPool->getConnectionForTable('pages');
-        $rows = $pageConnection->select(['uid'], 'pages', ['title' => 'BT Smoke Root', 'deleted' => 0])->fetchAllAssociative();
+        $queryBuilder = $pageConnection->createQueryBuilder();
+        $rows = $queryBuilder
+            ->select('uid')
+            ->from('pages')
+            ->where(
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter('BT Smoke Root')),
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->eq('slug', $queryBuilder->createNamedParameter('/batch-tests')),
+                        $queryBuilder->expr()->in('title', $queryBuilder->createNamedParameter(['Stapel Tests', 'Batch Tests', 'Batch-Tests'], \Doctrine\DBAL\ArrayParameterType::STRING))
+                    )
+                )
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
         foreach ($rows as $row) {
             $uids = $this->subtreeUids((int)$row['uid']);
             if ($uids === []) {
                 continue;
             }
-            $this->softDeleteByIn('pages', 'uid', $uids, time());
-            $this->softDeleteByIn('tt_content', 'pid', $uids, time());
-            $this->softDeleteByIn('sys_template', 'pid', $uids, time());
+            $this->softDeleteByIn('pages', 'uid', $uids, $now);
+            $this->softDeleteByIn('tt_content', 'pid', $uids, $now);
+            $this->softDeleteByIn('sys_template', 'pid', $uids, $now);
         }
+        $this->softDeleteOrphanedSmokePages($now);
+    }
+
+    private function softDeleteOrphanedSmokePages(int $now): void
+    {
+        $connection = $this->connectionPool->getConnectionForTable('pages');
+        $uids = array_map('intval', $connection->executeQuery(
+            'SELECT target.uid FROM pages target INNER JOIN pages source ON target.l10n_parent = source.uid'
+            . ' WHERE target.sys_language_uid > ? AND target.deleted = ? AND source.deleted = ? AND target.title LIKE ?',
+            [0, 0, 1, '[BT-SMOKE %'],
+            [
+                \Doctrine\DBAL\ParameterType::INTEGER,
+                \Doctrine\DBAL\ParameterType::INTEGER,
+                \Doctrine\DBAL\ParameterType::INTEGER,
+                \Doctrine\DBAL\ParameterType::STRING,
+            ]
+        )->fetchFirstColumn());
+
+        $this->softDeleteByIn('pages', 'uid', $uids, $now);
     }
 
     /**
@@ -208,7 +247,7 @@ final class SmokeFixtureService
         $queryBuilder
             ->delete($table)
             ->where(
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(self::TARGET_LANGUAGE_ID, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->gt('sys_language_uid', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $queryBuilder->expr()->in($parentField, $queryBuilder->createNamedParameter($sourceUids, \Doctrine\DBAL\ArrayParameterType::INTEGER))
             )
             ->executeStatement();
@@ -318,10 +357,23 @@ languages:
     fallbackType: fallback
     fallbacks: '0'
     websiteTitle: ''
+  -
+    title: Francais
+    enabled: true
+    languageId: 2
+    base: /fr/
+    locale: fr_FR.UTF-8
+    navigationTitle: Francais
+    flag: fr
+    hreflang: fr-FR
+    fallbackType: fallback
+    fallbacks: '0'
+    websiteTitle: ''
 errorHandling: []
 routes: {}
 YAML;
         file_put_contents($path, $yaml);
+        GeneralUtility::makeInstance(SiteConfiguration::class)->resolveAllExistingSites(false);
     }
 
     private function writeRootTemplate(int $rootPageUid, int $now): void

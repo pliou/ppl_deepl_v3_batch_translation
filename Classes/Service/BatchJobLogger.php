@@ -203,9 +203,9 @@ final class BatchJobLogger
             ->select('uid')
             ->from(self::JOB_TABLE)
             ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $queryBuilder->expr()->in('status', $queryBuilder->createNamedParameter(['finished', 'discarded', 'preview_failed'], \Doctrine\DBAL\ArrayParameterType::STRING)),
-                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($olderThanTimestamp, \PDO::PARAM_INT))
+                $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($olderThanTimestamp, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->executeQuery()
             ->fetchFirstColumn());
@@ -220,7 +220,7 @@ final class BatchJobLogger
             ->count('uid')
             ->from(self::ITEM_TABLE)
             ->where(
-                $itemQueryBuilder->expr()->eq('deleted', $itemQueryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $itemQueryBuilder->expr()->eq('deleted', $itemQueryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $itemQueryBuilder->expr()->in('job_uid', $itemQueryBuilder->createNamedParameter($jobUids, \Doctrine\DBAL\ArrayParameterType::INTEGER))
             )
             ->executeQuery()

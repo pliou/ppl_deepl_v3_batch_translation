@@ -1,7 +1,0 @@
-.idea/
-.Build/
-vendor/
-var/
-public/
-typo3temp/
-composer.lock

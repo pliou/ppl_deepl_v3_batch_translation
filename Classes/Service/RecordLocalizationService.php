@@ -52,9 +52,9 @@ final class RecordLocalizationService
             ->select('uid')
             ->from($table)
             ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq($translationPointer, $queryBuilder->createNamedParameter($sourceUid, \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq($translationPointer, $queryBuilder->createNamedParameter($sourceUid, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->setMaxResults(1)
             ->executeQuery()

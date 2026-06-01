@@ -478,9 +478,9 @@ final class SmokeMatrixRunner
             ->select('uid')
             ->from('pages')
             ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($sourceUid, \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($sourceUid, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->orderBy('uid', 'DESC')
             ->setMaxResults(1)
@@ -498,9 +498,9 @@ final class SmokeMatrixRunner
             ->select('uid')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('l18n_parent', $queryBuilder->createNamedParameter($sourceUid, \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($targetLanguageId, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('l18n_parent', $queryBuilder->createNamedParameter($sourceUid, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->orderBy('uid', 'DESC')
             ->setMaxResults(1)
@@ -531,7 +531,7 @@ final class SmokeMatrixRunner
         $row = $queryBuilder
             ->select('*')
             ->from('pages')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($pageUid, \PDO::PARAM_INT)))
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($pageUid, \Doctrine\DBAL\ParameterType::INTEGER)))
             ->executeQuery()
             ->fetchAssociative();
 
@@ -545,7 +545,7 @@ final class SmokeMatrixRunner
         $row = $queryBuilder
             ->select('*')
             ->from('tt_content')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($contentUid, \PDO::PARAM_INT)))
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($contentUid, \Doctrine\DBAL\ParameterType::INTEGER)))
             ->executeQuery()
             ->fetchAssociative();
 

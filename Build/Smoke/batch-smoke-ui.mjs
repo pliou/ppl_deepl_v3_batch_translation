@@ -5,7 +5,7 @@ import path from 'node:path';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
-const baseUrl = process.env.TYPO3_BASE_URL || 'http://typo3-12.ddev.site';
+const baseUrl = process.env.TYPO3_BASE_URL || 'http://typo3-14.ddev.site';
 const username = process.env.TYPO3_BE_USER || 'bt_admin';
 const password = process.env.TYPO3_BE_PASSWORD || 'BatchSmoke123!';
 const chromiumExecutablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '';

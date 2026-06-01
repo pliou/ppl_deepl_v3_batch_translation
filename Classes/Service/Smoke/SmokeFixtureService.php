@@ -190,11 +190,11 @@ final class SmokeFixtureService
             ->select('uid')
             ->from('pages')
             ->where(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('title', $queryBuilder->createNamedParameter('BT Smoke Root')),
                     $queryBuilder->expr()->and(
-                        $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter(1, \Doctrine\DBAL\ParameterType::INTEGER)),
                         $queryBuilder->expr()->eq('slug', $queryBuilder->createNamedParameter('/batch-tests')),
                         $queryBuilder->expr()->in('title', $queryBuilder->createNamedParameter(['Stapel Tests', 'Batch Tests', 'Batch-Tests'], \Doctrine\DBAL\ArrayParameterType::STRING))
                     )
@@ -332,7 +332,7 @@ final class SmokeFixtureService
 
         $yaml = <<<YAML
 rootPageId: {$rootPageUid}
-base: 'http://typo3-12.ddev.site/bt-smoke-root/'
+base: 'http://typo3-14.ddev.site/bt-smoke-root/'
 websiteTitle: 'Batch Translation Smoke Site'
 languages:
   -

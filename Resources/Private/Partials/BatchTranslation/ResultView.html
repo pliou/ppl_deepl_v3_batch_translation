@@ -1,0 +1,53 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <section class="ppl-batch__panel ppl-batch__panel--review" aria-labelledby="result-view-heading">
+        <div class="ppl-batch__panel-head">
+            <h2 id="result-view-heading"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.result.title" /> #{resultView.jobUid}</h2>
+            <span class="ppl-batch__badge ppl-batch__badge--translated">{resultView.status}</span>
+        </div>
+
+        <f:if condition="{resultView.isEmpty}">
+            <f:then>
+                <div class="ppl-batch__empty"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.result.empty" /></div>
+            </f:then>
+            <f:else>
+                <section class="ppl-batch__summary-grid">
+                    <span><strong>{resultView.counts.createdRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.created" /></span>
+                    <span><strong>{resultView.counts.updatedRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.updated" /></span>
+                    <span><strong>{resultView.counts.writtenFields}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.writtenFields" /></span>
+                    <span><strong>{resultView.counts.skippedRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.skipped" /></span>
+                    <span><strong>{resultView.counts.blockedRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.blocked" /></span>
+                    <span><strong>{resultView.counts.failedRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:result.failed" /></span>
+                </section>
+
+                <section class="ppl-batch__preview-list">
+                    <f:for each="{resultView.rows}" as="row">
+                        <article class="ppl-batch__preview-item">
+                            <header>
+                                <span class="ppl-batch__badge ppl-batch__badge--{row.status}">{row.status}</span>
+                                <strong>{row.label}</strong>
+                                <small>{row.table}:{row.sourceUid} -&gt; #{row.targetUid}</small>
+                            </header>
+                            <div class="ppl-batch__result-body">
+                                <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.result.writtenFields" /></strong> {row.writtenFields}</span>
+                                <f:if condition="{row.errorCode}">
+                                    <span><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:batch.result.errorCode" /></strong> {row.errorCode}</span>
+                                </f:if>
+                                <f:if condition="{row.error}">
+                                    <div class="ppl-batch__warning">{row.error}</div>
+                                </f:if>
+                                <div class="ppl-batch__result-links">
+                                    <f:if condition="{row.frontendUrl}">
+                                        <a class="btn btn-default btn-sm" href="{row.frontendUrl}" target="_blank" rel="noreferrer"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.openTranslatedPagePreview" /></a>
+                                    </f:if>
+                                    <f:if condition="{row.backendUrl}">
+                                        <a class="btn btn-default btn-sm" href="{row.backendUrl}"><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:action.openTargetRecord" /></a>
+                                    </f:if>
+                                </div>
+                            </div>
+                        </article>
+                    </f:for>
+                </section>
+            </f:else>
+        </f:if>
+    </section>
+</html>

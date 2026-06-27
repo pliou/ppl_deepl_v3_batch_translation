@@ -1,0 +1,69 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <f:if condition="{preflight}">
+        <section class="ppl-batch__preflight">
+            <div class="ppl-batch__panel-head">
+                <strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:panel.preflightPreview" /></strong>
+                <f:if condition="{preflight.jobUid}">
+                    <span class="ppl-batch__counter">Job #{preflight.jobUid}</span>
+                </f:if>
+            </div>
+            <div class="ppl-batch__summary-grid">
+                <span><strong>{preflight.counts.items}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.records" /></span>
+                <span><strong>{preflight.counts.pages}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.pages" /></span>
+                <span><strong>{preflight.counts.elements}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.elements" /></span>
+                <span><strong>{preflight.counts.createRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.create" /></span>
+                <span><strong>{preflight.counts.updateRecords}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.update" /></span>
+                <span><strong>{preflight.counts.fields}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.fields" /></span>
+                <span><strong>{preflight.counts.characters}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.deeplCharacters" /></span>
+                <span><strong>{preflight.counts.overwrites}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.overwrite" /></span>
+                <span><strong>{preflight.counts.blocked}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.blocked" /></span>
+                <span><strong>{preflight.counts.skipped}</strong> <f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.skipped" /></span>
+            </div>
+
+            <f:if condition="{preflight.messages}">
+                <div class="ppl-batch__preview-list">
+                    <f:for each="{preflight.messages}" as="message">
+                        <div class="ppl-batch__message ppl-batch__message--{message.type}">{message.text}</div>
+                    </f:for>
+                </div>
+            </f:if>
+
+            <div class="ppl-batch__preview-list">
+                <f:for each="{preflight.items}" as="item">
+                    <article class="ppl-batch__preview-item">
+                        <header>
+                            <span class="ppl-batch__badge ppl-batch__badge--{item.status}">{item.status}</span>
+                            <strong>{item.label}</strong>
+                            <small>{item.table}:{item.sourceUid} - {item.recordAction}</small>
+                        </header>
+                        <f:if condition="{item.permission.allowed}">
+                            <f:else>
+                                <div class="ppl-batch__warning">
+                                    <f:for each="{item.permission.reasons}" as="reason">{reason}<br></f:for>
+                                </div>
+                            </f:else>
+                        </f:if>
+                        <f:if condition="{item.errors}">
+                            <div class="ppl-batch__warning">
+                                <f:for each="{item.errors}" as="error">{error}<br></f:for>
+                            </div>
+                        </f:if>
+                        <div class="ppl-batch__operations">
+                            <f:for each="{item.fieldOperations}" as="operation">
+                                <div class="ppl-batch__operation ppl-batch__operation--{operation.writeAction}">
+                                    <span>{operation.label}</span>
+                                    <span>{operation.writeAction}</span>
+                                    <small><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.sourceValue" />:</strong> {operation.sourceValue}</small>
+                                    <f:if condition="{operation.targetValue}">
+                                        <small><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.currentValue" />:</strong> {operation.targetValue}</small>
+                                    </f:if>
+                                    <small><strong><f:translate key="LLL:EXT:ppl_deepl_v3_batch_translation/Resources/Private/Language/locallang.xlf:label.deeplProposal" />:</strong> {operation.translatedValue}</small>
+                                </div>
+                            </f:for>
+                        </div>
+                    </article>
+                </f:for>
+            </div>
+        </section>
+    </f:if>
+</html>

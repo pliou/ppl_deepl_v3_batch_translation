@@ -1,0 +1,16 @@
+* text=auto eol=lf
+/.git export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+/.github export-ignore
+/.Build export-ignore
+/.idea export-ignore
+/node_modules export-ignore
+/vendor export-ignore
+/var export-ignore
+/public export-ignore
+/typo3temp export-ignore
+/composer.lock export-ignore
+/package-lock.json export-ignore
+/Tests export-ignore
+/tests export-ignore

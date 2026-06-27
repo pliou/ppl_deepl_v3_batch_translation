@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Ppl\PplDeeplV3BatchTranslation\:
+    resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/*'
+
+  Ppl\PplDeeplV3BatchTranslation\Controller\:
+    resource: '../Classes/Controller/*'
+    public: true
+
+  Ppl\PplDeeplV3BatchTranslation\Service\TranslationProviderInterface:
+    alias: Ppl\PplDeeplV3BatchTranslation\Service\Smoke\SmokeAwareTranslationProvider

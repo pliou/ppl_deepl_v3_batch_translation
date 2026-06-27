@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-05-25T00:00:00Z" product-name="ppl_deepl_v3_batch_translation" target-language="es">
+        <header />
+        <body>
+            <trans-unit id="module.root.title">
+                <source>PPL DeepL V3</source>
+                <target>PPL DeepL V3</target>
+            </trans-unit>
+            <trans-unit id="module.root.description">
+                <source>PPL DeepL V3 translations.</source>
+                <target>PPL DeepL V3 traducciones.</target>
+            </trans-unit>
+            <trans-unit id="module.batchTranslation.title">
+                <source>Batch Translation</source>
+                <target>Traducción por lotes</target>
+            </trans-unit>
+            <trans-unit id="module.batchTranslation.description">
+                <source>Translate TYPO3 pages and content elements in controlled batches.</source>
+                <target>Traducir TYPO3 páginas y elementos de contenido en lotes controlados.</target>
+            </trans-unit>
+            <trans-unit id="backend.title">
+                <source>PPL DeepL V3 Batch Translation</source>
+                <target>PPL DeepL V3 Traducción por lotes</target>
+            </trans-unit>
+            <trans-unit id="backend.intro">
+                <source>Scan a page tree, choose scope, review the resolved selection, generate DeepL suggestions, then write confirmed translations.</source>
+                <target>Escanee un árbol de páginas, elija el alcance, revise la selección resuelta, genere DeepL sugerencias y luego escriba traducciones confirmadas.</target>
+            </trans-unit>
+            <trans-unit id="workflow.scope">
+                <source>Scope</source>
+                <target>Alcance</target>
+            </trans-unit>
+            <trans-unit id="workflow.scope.hint">
+                <source>Choose site and languages.</source>
+                <target>Elija sitio e idiomas.</target>
+            </trans-unit>
+            <trans-unit id="workflow.scan">
+                <source>Scan</source>
+                <target>Escanear</target>
+            </trans-unit>
+            <trans-unit id="workflow.scan.hint">
+                <source>Read page tree and status. No writes.</source>
+                <target>Leer el árbol de páginas y el estado. No escribe.</target>
+            </trans-unit>
+            <trans-unit id="workflow.select">
+                <source>Select</source>
+                <target>Seleccionar</target>
+            </trans-unit>
+            <trans-unit id="workflow.select.hint">
+                <source>Build pages, branches and elements.</source>
+                <target>Construye páginas, ramas y elementos.</target>
+            </trans-unit>
+            <trans-unit id="workflow.review">
+                <source>Review selection</source>
+                <target>Selección de reseñas</target>
+            </trans-unit>
+            <trans-unit id="workflow.review.hint">
+                <source>Inspect direct, inherited and excluded items.</source>
+                <target>Inspeccionar elementos directos, heredados y excluidos.</target>
+            </trans-unit>
+            
+            
+            
+            
+            
+            
+            <trans-unit id="workflow.translationPreview">
+                <source>Translation preview</source>
+                <target>Vista previa de la traducción</target>
+            </trans-unit>
+            <trans-unit id="workflow.translationPreview.hint">
+                <source>Generate cached DeepL suggestions. No writes.</source>
+                <target>Genere sugerencias DeepL almacenadas en caché. No escribe.</target>
+            </trans-unit>
+            <trans-unit id="workflow.write">
+                <source>Write</source>
+                <target>escribir</target>
+            </trans-unit>
+            <trans-unit id="workflow.write.hint">
+                <source>Write confirmed preview via DataHandler.</source>
+                <target>Escriba una vista previa confirmada a través de DataHandler.</target>
+            </trans-unit>
+            <trans-unit id="workflow.results">
+                <source>Results</source>
+                <target>Resultados</target>
+            </trans-unit>
+            <trans-unit id="workflow.results.hint">
+                <source>Review execution counters and errors.</source>
+                <target>Revisar contadores de ejecución y errores.</target>
+            </trans-unit>
+            <trans-unit id="site.root">
+                <source>Root page</source>
+                <target>página raíz</target>
+            </trans-unit>
+            <trans-unit id="site.pagesInSite">
+                <source>pages in site</source>
+                <target>páginas en el sitio</target>
+            </trans-unit>
+            <trans-unit id="field.site">
+                <source>Site</source>
+                <target>Sitio</target>
+            </trans-unit>
+            <trans-unit id="field.source">
+                <source>Source</source>
+                <target>Fuente</target>
+            </trans-unit>
+            <trans-unit id="field.target">
+                <source>Target</source>
+                <target>Objetivo</target>
+            </trans-unit>
+            <trans-unit id="field.mode">
+                <source>Selection preset</source>
+                <target>Selección preestablecida</target>
+            </trans-unit>
+            <trans-unit id="mode.selectionHint">
+                <source>Select only not translated skips existing translations. Select everything previews every selected writable field.</source>
+                <target>Seleccionar solo no traducido omite las traducciones existentes. Seleccionar todo muestra una vista previa de cada campo de escritura seleccionado.</target>
+            </trans-unit>
+            <trans-unit id="field.glossary">
+                <source>Glossary</source>
+                <target>Glosario</target>
+            </trans-unit>
+            <trans-unit id="field.styleRule">
+                <source>Style rule</source>
+                <target>Regla de estilo</target>
+            </trans-unit>
+            <trans-unit id="field.customInstructions">
+                <source>Custom instructions</source>
+                <target>Instrucciones personalizadas</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="action.scan">
+                <source>Scan</source>
+                <target>Escanear</target>
+            </trans-unit>
+            <trans-unit id="action.restartScan">
+                <source>Rescan</source>
+                <target>Volver a escanear</target>
+            </trans-unit>
+            <trans-unit id="action.reviewSelection">
+                <source>Review selected items</source>
+                <target>Revisar artículos seleccionados</target>
+            </trans-unit>
+            <trans-unit id="action.backToTree">
+                <source>Back to tree</source>
+                <target>Volver al árbol</target>
+            </trans-unit>
+            
+            <trans-unit id="action.previewBatch">
+                <source>Generate DeepL preview</source>
+                <target>Generar vista previa DeepL</target>
+            </trans-unit>
+            <trans-unit id="action.previewPage">
+                <source>Generate DeepL preview for this page</source>
+                <target>Generar vista previa DeepL para esta página</target>
+            </trans-unit>
+            <trans-unit id="action.previewElement">
+                <source>Generate DeepL preview for this element</source>
+                <target>Generar vista previa DeepL para este elemento</target>
+            </trans-unit>
+            <trans-unit id="action.repreviewPage">
+                <source>Generate retranslation preview for this page</source>
+                <target>Generar vista previa de retraducción para esta página</target>
+            </trans-unit>
+            <trans-unit id="action.repreviewElement">
+                <source>Generate retranslation preview for this element</source>
+                <target>Generar vista previa de retraducción para este elemento</target>
+            </trans-unit>
+            <trans-unit id="action.execute">
+                <source>Write confirmed translations</source>
+                <target>Escribir traducciones confirmadas</target>
+            </trans-unit>
+            <trans-unit id="action.retranslateSelected">
+                <source>Regenerate DeepL preview</source>
+                <target>Regenerar vista previa de DeepL</target>
+            </trans-unit>
+            <trans-unit id="action.discardPreview">
+                <source>Discard preview</source>
+                <target>Descartar vista previa</target>
+            </trans-unit>
+            <trans-unit id="action.clear">
+                <source>Clear selection</source>
+                <target>Borrar selección</target>
+            </trans-unit>
+            <trans-unit id="action.pagePreview">
+                <source>Page preview</source>
+                <target>Vista previa de la página</target>
+            </trans-unit>
+            <trans-unit id="action.backToReview">
+                <source>Back to review selection</source>
+                <target>Volver a revisar la selección</target>
+            </trans-unit>
+            <trans-unit id="action.exportResultLog">
+                <source>Export result log</source>
+                <target>Exportar registro de resultados</target>
+            </trans-unit>
+            
+            <trans-unit id="action.openTranslatedPagePreview">
+                <source>Open translated page preview</source>
+                <target>Abrir vista previa de página traducida</target>
+            </trans-unit>
+            <trans-unit id="action.openTargetRecord">
+                <source>Open target record</source>
+                <target>Abrir registro de destino</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="scope.elementOnly">
+                <source>Element only</source>
+                <target>Solo elemento</target>
+            </trans-unit>
+            <trans-unit id="legend.recursive">
+                <source>Branch = this page, child pages and selectable content elements</source>
+                <target>Rama = esta página, páginas secundarias y elementos de contenido seleccionables</target>
+            </trans-unit>
+            <trans-unit id="legend.onlyPage">
+                <source>Page = this page and selectable content elements, no child pages</source>
+                <target>Página = esta página y elementos de contenido seleccionables, sin páginas secundarias</target>
+            </trans-unit>
+            <trans-unit id="legend.elementOnly">
+                <source>Element only = selected content element only</source>
+                <target>Solo elemento = solo elemento de contenido seleccionado</target>
+            </trans-unit>
+            <trans-unit id="legend.blocked">
+                <source>Blocked = skipped with reason before execution</source>
+                <target>Bloqueado = omitido con motivo antes de la ejecución</target>
+            </trans-unit>
+            <trans-unit id="panel.pageTree">
+                <source>Page tree</source>
+                <target>Árbol de páginas</target>
+            </trans-unit>
+            <trans-unit id="panel.selectedPage">
+                <source>Selected page</source>
+                <target>Página seleccionada</target>
+            </trans-unit>
+            <trans-unit id="panel.pageFields">
+                <source>Page fields</source>
+                <target>Campos de página</target>
+            </trans-unit>
+            <trans-unit id="panel.contentElements">
+                <source>Content elements</source>
+                <target>Elementos de contenido</target>
+            </trans-unit>
+            
+            
+            <trans-unit id="panel.reviewSelection">
+                <source>Review selection</source>
+                <target>Selección de reseñas</target>
+            </trans-unit>
+            <trans-unit id="panel.preflightPreview">
+                <source>Live plan / Translation preview</source>
+                <target>Plan en vivo/vista previa de traducción</target>
+            </trans-unit>
+            <trans-unit id="panel.pagePreview">
+                <source>Page preview</source>
+                <target>Vista previa de la página</target>
+            </trans-unit>
+            <trans-unit id="label.hierarchy">
+                <source>Hierarchy</source>
+                <target>Jerarquía</target>
+            </trans-unit>
+            <trans-unit id="label.targetRecord">
+                <source>Target record</source>
+                <target>Registro objetivo</target>
+            </trans-unit>
+            <trans-unit id="label.elements">
+                <source>elements</source>
+                <target>elementos</target>
+            </trans-unit>
+            <trans-unit id="label.permission">
+                <source>Permission</source>
+                <target>Permiso</target>
+            </trans-unit>
+            
+            <trans-unit id="label.inheritedVia">
+                <source>Inherited via</source>
+                <target>Heredado vía</target>
+            </trans-unit>
+            
+            
+            
+            
+            <trans-unit id="label.liveSelectionSummary">
+                <source>Live selection summary</source>
+                <target>Resumen de selección en vivo</target>
+            </trans-unit>
+            <trans-unit id="label.liveSelectionEmpty">
+                <source>Choose a recursive branch, only this page or individual elements to resolve records and fields.</source>
+                <target>Elija una rama recursiva, solo esta página o elementos individuales para resolver registros y campos.</target>
+            </trans-unit>
+            <trans-unit id="label.selectedPages">
+                <source>selected pages</source>
+                <target>paginas seleccionadas</target>
+            </trans-unit>
+            <trans-unit id="label.branches">
+                <source>branches</source>
+                <target>ramas</target>
+            </trans-unit>
+            <trans-unit id="label.blocked">
+                <source>blocked</source>
+                <target>bloqueado</target>
+            </trans-unit>
+            <trans-unit id="label.create">
+                <source>create</source>
+                <target>crear</target>
+            </trans-unit>
+            <trans-unit id="label.fields">
+                <source>fields</source>
+                <target>campos</target>
+            </trans-unit>
+            <trans-unit id="label.selectedPagesTitle">
+                <source>Selected pages</source>
+                <target>Páginas seleccionadas</target>
+            </trans-unit>
+            <trans-unit id="label.selectedBranchesTitle">
+                <source>Selected recursive branches</source>
+                <target>Ramas recursivas seleccionadas</target>
+            </trans-unit>
+            <trans-unit id="label.selectedElementsTitle">
+                <source>Selected elements</source>
+                <target>Elementos seleccionados</target>
+            </trans-unit>
+            <trans-unit id="label.noSelectionYet">
+                <source>No selection yet. Choose a recursive branch, only this page or individual elements.</source>
+                <target>Aún no hay selección. Elija una rama recursiva, solo esta página o elementos individuales.</target>
+            </trans-unit>
+            <trans-unit id="label.noResolvedSelection">
+                <source>No resolved selection yet. Go back to the tree and choose a recursive branch, only this page or individual elements.</source>
+                <target>Aún no hay selección resuelta. Vuelva al árbol y elija una rama recursiva, solo esta página o elementos individuales.</target>
+            </trans-unit>
+            <trans-unit id="label.excludedPages">
+                <source>Excluded pages</source>
+                <target>Páginas excluidas</target>
+            </trans-unit>
+            <trans-unit id="label.excludedElements">
+                <source>Excluded elements</source>
+                <target>Elementos excluidos</target>
+            </trans-unit>
+            <trans-unit id="label.excluded">
+                <source>Excluded</source>
+                <target>excluido</target>
+            </trans-unit>
+            <trans-unit id="label.removedFromRecursiveSelection">
+                <source>Removed from recursive selection.</source>
+                <target>Eliminado de la selección recursiva.</target>
+            </trans-unit>
+            <trans-unit id="label.resolvedPages">
+                <source>pages in resolved order</source>
+                <target>páginas en orden resuelto</target>
+            </trans-unit>
+            <trans-unit id="label.contentElements">
+                <source>content elements</source>
+                <target>elementos de contenido</target>
+            </trans-unit>
+            <trans-unit id="label.willCreate">
+                <source>Will create</source>
+                <target>creará</target>
+            </trans-unit>
+            <trans-unit id="label.willUpdate">
+                <source>Will update</source>
+                <target>Se actualizará</target>
+            </trans-unit>
+            <trans-unit id="label.willSkip">
+                <source>Will skip</source>
+                <target>saltará</target>
+            </trans-unit>
+            <trans-unit id="label.estimatedCharacters">
+                <source>Estimated DeepL characters</source>
+                <target>DeepL caracteres estimados</target>
+            </trans-unit>
+            
+            <trans-unit id="label.sourceValue">
+                <source>Source</source>
+                <target>Fuente</target>
+            </trans-unit>
+            <trans-unit id="label.currentValue">
+                <source>Existing translation</source>
+                <target>Traducción existente</target>
+            </trans-unit>
+            <trans-unit id="label.deeplProposal">
+                <source>DeepL suggestion</source>
+                <target>DeepL sugerencia</target>
+            </trans-unit>
+            <trans-unit id="label.translationPlaceholder">
+                <source>Translation will appear here.</source>
+                <target>La traducción aparecerá aquí.</target>
+            </trans-unit>
+            <trans-unit id="label.translationMissing">
+                <source>No existing translation yet.</source>
+                <target>Aún no existe traducción.</target>
+            </trans-unit>
+            <trans-unit id="label.noPendingTranslation">
+                <source>No pending translation</source>
+                <target>No hay traducción pendiente</target>
+            </trans-unit>
+            <trans-unit id="label.operationWillWrite">
+                <source>will write</source>
+                <target>escribirá</target>
+            </trans-unit>
+            <trans-unit id="label.operationFillEmpty">
+                <source>fills empty field</source>
+                <target>llena el campo vacío</target>
+            </trans-unit>
+            <trans-unit id="label.operationOverwrite">
+                <source>will overwrite</source>
+                <target>sobrescribirá</target>
+            </trans-unit>
+            <trans-unit id="label.loadingPreview">
+                <source>Generating DeepL preview...</source>
+                <target>Generando vista previa de DeepL...</target>
+            </trans-unit>
+            <trans-unit id="label.previewReady">
+                <source>DeepL preview ready.</source>
+                <target>DeepL vista previa lista.</target>
+            </trans-unit>
+            <trans-unit id="visibility.title">
+                <source>Visibility after write</source>
+                <target>Visibilidad después de escribir</target>
+            </trans-unit>
+            <trans-unit id="visibility.hint">
+                <source>On publishes written target records. Off keeps them hidden after DataHandler writes.</source>
+                <target>En publica registros de destino escritos. Off los mantiene ocultos después de que escribe DataHandler.</target>
+            </trans-unit>
+            <trans-unit id="visibility.on">
+                <source>On</source>
+                <target>encendido</target>
+            </trans-unit>
+            <trans-unit id="visibility.off">
+                <source>Off</source>
+                <target>Apagado</target>
+            </trans-unit>
+            <trans-unit id="label.noConfiguredPageFields">
+                <source>No configured page fields contain source text.</source>
+                <target>Ningún campo de página configurado contiene texto fuente.</target>
+            </trans-unit>
+            <trans-unit id="label.selectPageForPreview">
+                <source>Select a page in review to inspect its preview.</source>
+                <target>Seleccione una página en revisión para inspeccionar su vista previa.</target>
+            </trans-unit>
+            <trans-unit id="result.created">
+                <source>created</source>
+                <target>creado</target>
+            </trans-unit>
+            <trans-unit id="result.updated">
+                <source>updated</source>
+                <target>actualizado</target>
+            </trans-unit>
+            <trans-unit id="result.writtenFields">
+                <source>written fields</source>
+                <target>campos escritos</target>
+            </trans-unit>
+            <trans-unit id="result.skipped">
+                <source>skipped</source>
+                <target>saltado</target>
+            </trans-unit>
+            <trans-unit id="result.blocked">
+                <source>blocked</source>
+                <target>bloqueado</target>
+            </trans-unit>
+            <trans-unit id="result.failed">
+                <source>failed</source>
+                <target>falló</target>
+            </trans-unit>
+            <trans-unit id="confirm.discardPreview">
+                <source>You have unapplied translation previews. This action will discard them. Continue?</source>
+                <target>Tienes vistas previas de traducción no aplicadas. Esta acción los descartará. ¿Continuar?</target>
+            </trans-unit>
+            <trans-unit id="confirm.writeTranslations">
+                <source>Write the confirmed translation preview into TYPO3 now?</source>
+                <target>¿Escribir la vista previa de la traducción confirmada en TYPO3 ahora?</target>
+            </trans-unit>
+            <trans-unit id="confirm.retranslate">
+                <source>Regenerate selected DeepL preview and replace cached suggestions. Continue?</source>
+                <target>Vuelva a generar la vista previa de DeepL seleccionada y reemplace las sugerencias almacenadas en caché. ¿Continuar?</target>
+            </trans-unit>
+            <trans-unit id="message.scanComplete">
+                <source>Scan complete. Build a selection and review selected items.</source>
+                <target>Escaneo completo. Cree una selección y revise los artículos seleccionados.</target>
+            </trans-unit>
+            <trans-unit id="message.scanRestarted">
+                <source>Scan restarted. Any unapplied translation preview was discarded.</source>
+                <target>Se reinició el escaneo. Se descartó cualquier vista previa de traducción no aplicada.</target>
+            </trans-unit>
+            <trans-unit id="message.previewDiscarded">
+                <source>Translation preview was discarded.</source>
+                <target>Se descartó la vista previa de la traducción.</target>
+            </trans-unit>
+            <trans-unit id="message.previewNeedsSelection">
+                <source>Choose at least one page, branch or content element before generating a preview.</source>
+                <target>Elija al menos una página, rama o elemento de contenido antes de generar una vista previa.</target>
+            </trans-unit>
+            <trans-unit id="message.previewReady">
+                <source>DeepL translation preview ready as job #%d. Review it before writing.</source>
+                <target>DeepL vista previa de traducción lista como trabajo #%d. Revíselo antes de escribir.</target>
+            </trans-unit>
+            <trans-unit id="message.previewFailedWithJob">
+                <source>DeepL suggestion generation failed. Audit job #%d was recorded, but nothing is ready to write.</source>
+                <target>DeepL falló la generación de sugerencias. Se registró el trabajo de auditoría n.º %d, pero no hay nada listo para escribir.</target>
+            </trans-unit>
+            <trans-unit id="message.writeNeedsPreview">
+                <source>Write requires a confirmed translation preview job for the current selection.</source>
+                <target>Write requiere un trabajo de vista previa de traducción confirmado para la selección actual.</target>
+            </trans-unit>
+            <trans-unit id="message.invalidFormToken">
+                <source>The form token is invalid. Please reload the module and try again.</source>
+                <target>El token del formulario no es válido. Vuelva a cargar el módulo e inténtelo de nuevo.</target>
+            </trans-unit>
+            <trans-unit id="message.jobAccessDenied">
+                <source>You may only access batch translation jobs that you created.</source>
+                <target>Solo puede acceder a los trabajos de traducción por lotes que haya creado.</target>
+            </trans-unit>
+            <trans-unit id="empty.beforeScan">
+                <source>Choose site and languages, then scan the page tree. Mode is controlled in the action panel.</source>
+                <target>Elija el sitio y los idiomas, luego escanee el árbol de páginas. El modo se controla en el panel de acciones.</target>
+            </trans-unit>
+            <trans-unit id="batch.result.title">
+                <source>Translation results</source>
+                <target>Resultados de traducción</target>
+            </trans-unit>
+            <trans-unit id="batch.result.empty">
+                <source>No result rows were recorded for this job.</source>
+                <target>No se registraron filas de resultados para este trabajo.</target>
+            </trans-unit>
+            <trans-unit id="batch.result.writtenFields">
+                <source>Written fields</source>
+                <target>Campos escritos</target>
+            </trans-unit>
+            <trans-unit id="batch.result.errorCode">
+                <source>Error code</source>
+                <target>código de error</target>
+            </trans-unit>
+            <trans-unit id="tree.rows">
+                <source>rows</source>
+                <target>filas</target>
+            </trans-unit>
+            <trans-unit id="workflow.ariaLabel">
+                <source>Batch translation progress</source>
+                <target>Progreso de la traducción por lotes</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.current">
+                <source>current step</source>
+                <target>paso actual</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.completed">
+                <source>completed</source>
+                <target>completado</target>
+            </trans-unit>
+            <trans-unit id="workflow.state.upcoming">
+                <source>upcoming</source>
+                <target>próximo</target>
+            </trans-unit>
+            <trans-unit id="workflow.stepAria">
+                <source>Step %d, %s, %s</source>
+                <target>Paso %d, %s, %s</target>
+            </trans-unit>
+            <trans-unit id="site.contextBar">
+                <source>Batch translation context</source>
+                <target>Contexto de traducción por lotes</target>
+            </trans-unit>
+            <trans-unit id="group.translationSetup">
+                <source>Translation setup</source>
+                <target>Configuración de traducción</target>
+            </trans-unit>
+            <trans-unit id="action.changeSetup">
+                <source>Change</source>
+                <target>Cambiar</target>
+            </trans-unit>
+            <trans-unit id="action.removeSelection">
+                <source>Remove selection</source>
+                <target>Eliminar selección</target>
+            </trans-unit>
+            <trans-unit id="action.removeExclusion">
+                <source>Remove exclusion</source>
+                <target>Eliminar exclusión</target>
+            </trans-unit>
+            <trans-unit id="action.startNewBatch">
+                <source>Start new batch</source>
+                <target>Iniciar nuevo lote</target>
+            </trans-unit>
+            <trans-unit id="action.previewBatch.tooltip">
+                <source>Uses DeepL quota when this mode translates text. Does not write records.</source>
+                <target>Utiliza la cuota DeepL cuando este modo traduce texto. No escribe registros.</target>
+            </trans-unit>
+            <trans-unit id="field.customInstructions.placeholder">
+                <source>Add custom instructions (optional)</source>
+                <target>Agregar instrucciones personalizadas (opcional)</target>
+            </trans-unit>
+            <trans-unit id="workspace.beforeScan">
+                <source>Ready to scan</source>
+                <target>Listo para escanear</target>
+            </trans-unit>
+            <trans-unit id="panel.pageTreeHint">
+                <source>Choose branches, pages or individual content elements for this batch.</source>
+                <target>Elija ramas, páginas o elementos de contenido individuales para este lote.</target>
+            </trans-unit>
+            <trans-unit id="panel.batchInspector">
+                <source>Batch inspector</source>
+                <target>inspector de lotes</target>
+            </trans-unit>
+            <trans-unit id="panel.reviewSelectionHint">
+                <source>Review the resolved batch before generating DeepL suggestions.</source>
+                <target>Revise el lote resuelto antes de generar DeepL sugerencias.</target>
+            </trans-unit>
+            <trans-unit id="filter.searchTree">
+                <source>Search page tree</source>
+                <target>Árbol de páginas de búsqueda</target>
+            </trans-unit>
+            <trans-unit id="filter.searchTree.placeholder">
+                <source>Search title, UID or content</source>
+                <target>Título de búsqueda, UID o contenido</target>
+            </trans-unit>
+            <trans-unit id="filter.status">
+                <source>Filter page status</source>
+                <target>Estado de la página de filtro</target>
+            </trans-unit>
+            <trans-unit id="filter.all">
+                <source>All</source>
+                <target>Todos</target>
+            </trans-unit>
+            <trans-unit id="filter.missing">
+                <source>Missing</source>
+                <target>desaparecido</target>
+            </trans-unit>
+            <trans-unit id="filter.partial">
+                <source>Partial</source>
+                <target>Parcial</target>
+            </trans-unit>
+            <trans-unit id="filter.translated">
+                <source>Translated</source>
+                <target>Traducido</target>
+            </trans-unit>
+            <trans-unit id="filter.emptyFields">
+                <source>Empty fields</source>
+                <target>Campos vacios</target>
+            </trans-unit>
+            <trans-unit id="filter.hidden">
+                <source>Hidden</source>
+                <target>Oculto</target>
+            </trans-unit>
+            <trans-unit id="filter.blocked">
+                <source>Blocked</source>
+                <target>Bloqueado</target>
+            </trans-unit>
+            <trans-unit id="filter.sourceMissing">
+                <source>Source missing</source>
+                <target>Falta la fuente</target>
+            </trans-unit>
+            <trans-unit id="filter.selected">
+                <source>Selected</source>
+                <target>Seleccionado</target>
+            </trans-unit>
+            <trans-unit id="filter.hasContent">
+                <source>Has content</source>
+                <target>tiene contenido</target>
+            </trans-unit>
+            <trans-unit id="legend.ariaLabel">
+                <source>Selection legend</source>
+                <target>Leyenda de selección</target>
+            </trans-unit>
+            <trans-unit id="tree.branch">
+                <source>Branch</source>
+                <target>Sucursal</target>
+            </trans-unit>
+            <trans-unit id="tree.pageOnly">
+                <source>Page</source>
+                <target>Página</target>
+            </trans-unit>
+            <trans-unit id="tree.page">
+                <source>Page</source>
+                <target>Página</target>
+            </trans-unit>
+            <trans-unit id="tree.status">
+                <source>Status</source>
+                <target>Estado</target>
+            </trans-unit>
+            <trans-unit id="tree.elementsLocales">
+                <source>Elements / Locales</source>
+                <target>Elementos/locales</target>
+            </trans-unit>
+            <trans-unit id="tree.actions">
+                <source>Actions</source>
+                <target>Acciones</target>
+            </trans-unit>
+            <trans-unit id="tree.branch.tooltip">
+                <source>Select this page, child pages and selectable content elements.</source>
+                <target>Seleccione esta página, páginas secundarias y elementos de contenido seleccionables.</target>
+            </trans-unit>
+            <trans-unit id="tree.pageOnly.tooltip">
+                <source>Select this page and selectable content elements, without child pages.</source>
+                <target>Seleccione esta página y elementos de contenido seleccionables, sin páginas secundarias.</target>
+            </trans-unit>
+            <trans-unit id="a11y.selectBranch">
+                <source>Select branch and children for page #%d %s</source>
+                <target>Seleccione rama e hijos para la página #%d %s</target>
+            </trans-unit>
+            <trans-unit id="a11y.selectPageOnly">
+                <source>Select page only for page #%d %s</source>
+                <target>Seleccione la página solo para la página #%d %s</target>
+            </trans-unit>
+            <trans-unit id="a11y.includePage">
+                <source>Include %s in this batch</source>
+                <target>Incluir %s en este lote</target>
+            </trans-unit>
+            <trans-unit id="a11y.includeElement">
+                <source>Include %s in this batch</source>
+                <target>Incluir %s en este lote</target>
+            </trans-unit>
+            <trans-unit id="abbr.elements">
+                <source>el</source>
+                <target>el</target>
+            </trans-unit>
+            <trans-unit id="abbr.locales">
+                <source>loc</source>
+                <target>loc</target>
+            </trans-unit>
+            <trans-unit id="empty.noPagesFound">
+                <source>No pages found for this scan.</source>
+                <target>No se encontraron páginas para este escaneo.</target>
+            </trans-unit>
+            <trans-unit id="empty.noContentElements">
+                <source>No default-language content elements found on this page.</source>
+                <target>No se encontraron elementos de contenido en el idioma predeterminado en esta página.</target>
+            </trans-unit>
+            <trans-unit id="empty.choosePageForDetail">
+                <source>Choose a page from the tree to inspect fields and elements.</source>
+                <target>Elija una página del árbol para inspeccionar campos y elementos.</target>
+            </trans-unit>
+            <trans-unit id="label.translationContext">
+                <source>Translation context</source>
+                <target>Contexto de traducción</target>
+            </trans-unit>
+            <trans-unit id="label.noGlossary">
+                <source>No glossary</source>
+                <target>Sin glosario</target>
+            </trans-unit>
+            <trans-unit id="label.noApprovedGlossary">
+                <source>No approved glossary</source>
+                <target>No hay glosario aprobado</target>
+            </trans-unit>
+            <trans-unit id="label.noStyleRule">
+                <source>No style rule</source>
+                <target>Sin regla de estilo</target>
+            </trans-unit>
+            <trans-unit id="label.noApprovedStyleRule">
+                <source>No approved style rule</source>
+                <target>Ninguna regla de estilo aprobada</target>
+            </trans-unit>
+            <trans-unit id="label.noWritesYet">
+                <source>No writes yet</source>
+                <target>No hay escritos todavía</target>
+            </trans-unit>
+            <trans-unit id="label.readyToWriteConfirmedTranslations">
+                <source>Ready to write confirmed translations</source>
+                <target>Listo para escribir traducciones confirmadas</target>
+            </trans-unit>
+            <trans-unit id="label.writeCompleted">
+                <source>Write completed</source>
+                <target>Escritura completada</target>
+            </trans-unit>
+            <trans-unit id="label.sourceLanguageFallback">
+                <source>Source language</source>
+                <target>Idioma de origen</target>
+            </trans-unit>
+            <trans-unit id="label.targetLanguageFallback">
+                <source>Target language</source>
+                <target>Idioma de destino</target>
+            </trans-unit>
+            <trans-unit id="label.selectionMetrics">
+                <source>Selection metrics</source>
+                <target>Métricas de selección</target>
+            </trans-unit>
+            <trans-unit id="label.reviewMetrics">
+                <source>Resolved selection metrics</source>
+                <target>Métricas de selección resueltas</target>
+            </trans-unit>
+            <trans-unit id="label.items">
+                <source>items</source>
+                <target>artículos</target>
+            </trans-unit>
+            <trans-unit id="label.page">
+                <source>Page</source>
+                <target>Página</target>
+            </trans-unit>
+            <trans-unit id="label.pages">
+                <source>pages</source>
+                <target>paginas</target>
+            </trans-unit>
+            <trans-unit id="label.element">
+                <source>Element</source>
+                <target>Elemento</target>
+            </trans-unit>
+            <trans-unit id="label.records">
+                <source>records</source>
+                <target>registros</target>
+            </trans-unit>
+            <trans-unit id="label.update">
+                <source>update</source>
+                <target>actualizar</target>
+            </trans-unit>
+            <trans-unit id="label.deeplCharacters">
+                <source>DeepL chars</source>
+                <target>DeepL caracteres</target>
+            </trans-unit>
+            <trans-unit id="label.overwrite">
+                <source>overwrite</source>
+                <target>sobrescribir</target>
+            </trans-unit>
+            <trans-unit id="label.skipped">
+                <source>skipped</source>
+                <target>saltado</target>
+            </trans-unit>
+            <trans-unit id="label.willWriteList">
+                <source>Will write</source>
+                <target>escribirá</target>
+            </trans-unit>
+            <trans-unit id="label.selectedElementsOnPage">
+                <source>selected elements on this page</source>
+                <target>elementos seleccionados en esta página</target>
+            </trans-unit>
+            <trans-unit id="label.contentElement">
+                <source>Content element</source>
+                <target>Elemento de contenido</target>
+            </trans-unit>
+            <trans-unit id="label.untitledPage">
+                <source>Untitled page</source>
+                <target>Página sin título</target>
+            </trans-unit>
+            <trans-unit id="label.notTranslated">
+                <source>not translated</source>
+                <target>no traducido</target>
+            </trans-unit>
+            <trans-unit id="label.existing">
+                <source>existing</source>
+                <target>existente</target>
+            </trans-unit>
+            <trans-unit id="label.writable">
+                <source>Writable</source>
+                <target>grabable</target>
+            </trans-unit>
+            <trans-unit id="mode.translateMissingOnly">
+                <source>Select only not translated</source>
+                <target>Seleccionar solo no traducido</target>
+            </trans-unit>
+            <trans-unit id="mode.retranslateSelected">
+                <source>Select everything</source>
+                <target>Selecciona todo</target>
+            </trans-unit>
+            <trans-unit id="scope.pageOnly">
+                <source>Page only</source>
+                <target>Sólo página</target>
+            </trans-unit>
+            <trans-unit id="scope.branchChildren">
+                <source>Branch + children</source>
+                <target>Rama + niños</target>
+            </trans-unit>
+            <trans-unit id="scope.inheritedBranchChildren">
+                <source>Inherited from branch + children</source>
+                <target>Heredado de rama + hijos</target>
+            </trans-unit>
+            <trans-unit id="scope.elementPageContext">
+                <source>Element-only page context</source>
+                <target>Contexto de página de solo elemento</target>
+            </trans-unit>
+            <trans-unit id="origin.direct">
+                <source>direct</source>
+                <target>directo</target>
+            </trans-unit>
+            <trans-unit id="origin.inherited">
+                <source>inherited</source>
+                <target>heredado</target>
+            </trans-unit>
+            <trans-unit id="reason.excluded">
+                <source>Excluded</source>
+                <target>excluido</target>
+            </trans-unit>
+            <trans-unit id="reason.excludedFromRecursiveBranch">
+                <source>Excluded from recursive branch</source>
+                <target>Excluido de la rama recursiva</target>
+            </trans-unit>
+            <trans-unit id="reason.excludedFromPageOnlySelection">
+                <source>Excluded from page-only selection</source>
+                <target>Excluido de la selección de solo página</target>
+            </trans-unit>
+            <trans-unit id="summary.onePageOneElementPattern">
+                <source>1 page record, %d content element</source>
+                <target>Registro de 1 página, elemento de contenido %d</target>
+            </trans-unit>
+            <trans-unit id="summary.onePageElementsPattern">
+                <source>1 page record, %d content elements</source>
+                <target>Registro de 1 página, %d elementos de contenido</target>
+            </trans-unit>
+            <trans-unit id="summary.scopeCountsPattern">
+                <source>%d pages, %d content elements</source>
+                <target>%d páginas, %d elementos de contenido</target>
+            </trans-unit>
+            <trans-unit id="summary.onPagePattern">
+                <source>On page #%d %s</source>
+                <target>En la página #%d %s</target>
+            </trans-unit>
+            <trans-unit id="summary.singleContentElement">
+                <source>Single content element</source>
+                <target>Elemento de contenido único</target>
+            </trans-unit>
+            <trans-unit id="summary.recordLabelPattern">
+                <source>%s #%d %s</source>
+                <target>%s #%d %s</target>
+            </trans-unit>
+            <trans-unit id="summary.elementPermissionCounts">
+                <source>%d total, %d selectable, %d blocked</source>
+                <target>%d total, %d seleccionable, %d bloqueado</target>
+            </trans-unit>
+            <trans-unit id="permission.missingPagesModify">
+                <source>Missing pages modify permission.</source>
+                <target>Las páginas que faltan modifican el permiso.</target>
+            </trans-unit>
+            <trans-unit id="permission.noBackendUser">
+                <source>No backend user is available.</source>
+                <target>No hay ningún usuario backend disponible.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingTableModify">
+                <source>Missing %s modify permission.</source>
+                <target>Falta el permiso de modificación %s.</target>
+            </trans-unit>
+            <trans-unit id="permission.noTargetLanguageAccess">
+                <source>User cannot access target language %d.</source>
+                <target>El usuario no puede acceder al idioma de destino %d.</target>
+            </trans-unit>
+            <trans-unit id="permission.sourcePageNotFound">
+                <source>Source page %d was not found.</source>
+                <target>No se encontró la página de origen %d.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingPageEdit">
+                <source>Missing page edit permission.</source>
+                <target>Falta permiso de edición de página.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingContentModify">
+                <source>Missing tt_content modify permission.</source>
+                <target>Falta el permiso de modificación de tt_content.</target>
+            </trans-unit>
+            <trans-unit id="permission.missingParentContentEdit">
+                <source>Missing content edit permission on parent page.</source>
+                <target>Falta permiso de edición de contenido en la página principal.</target>
+            </trans-unit>
+            <trans-unit id="permission.sourceLanguageRecordMissing">
+                <source>The selected source language record is missing.</source>
+                <target>Falta el registro del idioma de origen seleccionado.</target>
+            </trans-unit>
+            <trans-unit id="message.selectionUpdated">
+                <source>Selection updated.</source>
+                <target>Selección actualizada.</target>
+            </trans-unit>
+            <trans-unit id="message.previewFailed">
+                <source>Preview request failed.</source>
+                <target>Error en la solicitud de vista previa.</target>
+            </trans-unit>
+            <trans-unit id="message.writingTranslations">
+                <source>Writing confirmed translations.</source>
+                <target>Redacción de traducciones confirmadas.</target>
+            </trans-unit>
+            <trans-unit id="tca.job">
+                <source>DeepL batch translation job</source>
+                <target>DeepL trabajo de traducción por lotes</target>
+            </trans-unit>
+            <trans-unit id="tca.jobItem">
+                <source>DeepL batch translation job item</source>
+                <target>DeepL elemento de trabajo de traducción por lotes</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

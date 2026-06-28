@@ -1,6 +1,6 @@
 # PPL DeepL V3 Batch Translation
 
-TYPO3 backend workspace for controlled batch translation of `pages` and `tt_content` records through `ppl_deepl_v3_requests`.
+TYPO3 14 backend workspace for controlled batch translation of `pages` and `tt_content` records through `ppl_deepl_v3_requests`.
 
 ## Important UI Contracts
 

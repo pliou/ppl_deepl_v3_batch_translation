@@ -1,6 +1,6 @@
 {
   "name": "ppl/ppl-deepl-v3-batch-translation",
-  "description": "TYPO3 13.4 backend workspace for controlled page tree and content element translation with DeepL V3.",
+  "description": "TYPO3 14 backend workspace for controlled page tree and content element translation with DeepL V3.",
   "type": "typo3-cms-extension",
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -13,11 +13,11 @@
   "require": {
     "php": ">=8.2",
     "ext-mbstring": "*",
-    "ppl/ppl-deepl-v3-requests": "^13.4",
-    "typo3/cms-backend": "^13.4",
-    "typo3/cms-core": "^13.4",
-    "typo3/cms-extbase": "^13.4",
-    "typo3/cms-fluid": "^13.4"
+    "ppl/ppl-deepl-v3-requests": "^14.0",
+    "typo3/cms-backend": "^14.0",
+    "typo3/cms-core": "^14.0",
+    "typo3/cms-extbase": "^14.0",
+    "typo3/cms-fluid": "^14.0"
   },
   "autoload": {
     "psr-4": {
@@ -31,7 +31,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-main": "13.4.x-dev"
+      "dev-main": "14.x-dev"
     },
     "typo3/cms": {
       "extension-key": "ppl_deepl_v3_batch_translation"

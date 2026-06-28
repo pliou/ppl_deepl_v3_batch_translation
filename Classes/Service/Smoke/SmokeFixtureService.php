@@ -330,7 +330,7 @@ final class SmokeFixtureService
 
         $yaml = <<<YAML
 rootPageId: {$rootPageUid}
-base: 'http://typo3-12.ddev.site/bt-smoke-root/'
+base: 'http://typo3-14.ddev.site/bt-smoke-root/'
 websiteTitle: 'Batch Translation Smoke Site'
 languages:
   -

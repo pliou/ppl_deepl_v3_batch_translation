@@ -14,6 +14,10 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 
 final class BatchPreflightService
 {
+    use PageScanLimitTrait;
+
+    private const PAGE_SCAN_LIMIT = 3000;
+
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly RecordLocalizationService $localizationService,
@@ -356,9 +360,10 @@ final class BatchPreflightService
             )
             ->orderBy('pid', 'ASC')
             ->addOrderBy('sorting', 'ASC')
-            ->setMaxResults(3000)
+            ->setMaxResults(self::PAGE_SCAN_LIMIT + 1)
             ->executeQuery()
             ->fetchAllAssociative();
+        $rows = $this->capScannedPages($rows, self::PAGE_SCAN_LIMIT);
 
         $pages = [];
         foreach ($rows as $row) {

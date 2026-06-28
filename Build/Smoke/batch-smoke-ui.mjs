@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
 
 const baseUrl = process.env.TYPO3_BASE_URL || 'http://typo3-12.ddev.site';
 const username = process.env.TYPO3_BE_USER || 'bt_admin';
-const password = process.env.TYPO3_BE_PASSWORD || 'BatchSmoke123!';
+const password = process.env.TYPO3_BE_PASSWORD || process.env.PPL_BATCH_TRANSLATION_SMOKE_PASSWORD || '';
 const chromiumExecutablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '';
 const artifactRoot = process.env.PPL_BATCH_TRANSLATION_SMOKE_ARTIFACT_ROOT || path.resolve('var/smoke/batch-translation/manual-ui');
 const fakeCallLogPath = process.env.PPL_BATCH_TRANSLATION_FAKE_CALL_LOG || '';
@@ -22,6 +22,10 @@ const viewportMatrix = [
   { width: 360, height: 900 },
 ];
 const themes = ['light', 'dark'];
+
+if (password === '') {
+  throw new Error('Set TYPO3_BE_PASSWORD or PPL_BATCH_TRANSLATION_SMOKE_PASSWORD before running the UI smoke.');
+}
 
 fs.mkdirSync(screenshotDir, { recursive: true });
 fs.mkdirSync(reportDir, { recursive: true });

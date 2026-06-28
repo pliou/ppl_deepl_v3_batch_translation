@@ -110,4 +110,30 @@ final class TranslationWriter
         return is_array($dataHandler->errorLog ?? null) ? $dataHandler->errorLog : [];
     }
 
+    /**
+     * Compensating delete for a target record this batch run created but could not finish
+     * writing/making consistent. Lets a later re-run start clean instead of leaving an
+     * orphaned, half-written localization behind.
+     *
+     * @return string[]
+     */
+    public function deleteRecord(string $table, int $targetUid): array
+    {
+        if ($table === '' || $targetUid <= 0) {
+            return [];
+        }
+
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start([], [
+            $table => [
+                $targetUid => [
+                    'delete' => 1,
+                ],
+            ],
+        ]);
+        $dataHandler->process_cmdmap();
+
+        return is_array($dataHandler->errorLog ?? null) ? $dataHandler->errorLog : [];
+    }
+
 }

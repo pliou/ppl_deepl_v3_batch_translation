@@ -16,10 +16,25 @@ final class RecordLocalizationService
 
     public function ensureLocalizedRecord(string $table, int $sourceUid, int $targetLanguageId, int $translationSourceUid = 0): int
     {
+        return $this->ensureLocalizedRecordWithOrigin($table, $sourceUid, $targetLanguageId, $translationSourceUid)['uid'];
+    }
+
+    /**
+     * Like ensureLocalizedRecord(), but also reports whether THIS call created the localized record
+     * or merely found one that already existed.
+     *
+     * The distinction is safety-critical for the batch: a translation that appeared between preview
+     * and execution (created by another editor or job) must never be treated as "created by us" and
+     * deleted by a later-step compensation. Only `created === true` records are ours to roll back.
+     *
+     * @return array{uid: int, created: bool}
+     */
+    public function ensureLocalizedRecordWithOrigin(string $table, int $sourceUid, int $targetLanguageId, int $translationSourceUid = 0): array
+    {
         $existingUid = $this->findLocalizedRecordUid($table, $sourceUid, $targetLanguageId);
         if ($existingUid > 0) {
             $this->setTranslationSource($table, $existingUid, $sourceUid, $translationSourceUid);
-            return $existingUid;
+            return ['uid' => $existingUid, 'created' => false];
         }
 
         $commandMap = [
@@ -33,10 +48,10 @@ final class RecordLocalizationService
         $dataHandler->start([], $commandMap);
         $dataHandler->process_cmdmap();
 
-        $existingUid = $this->findLocalizedRecordUid($table, $sourceUid, $targetLanguageId);
-        if ($existingUid > 0) {
-            $this->setTranslationSource($table, $existingUid, $sourceUid, $translationSourceUid);
-            return $existingUid;
+        $createdUid = $this->findLocalizedRecordUid($table, $sourceUid, $targetLanguageId);
+        if ($createdUid > 0) {
+            $this->setTranslationSource($table, $createdUid, $sourceUid, $translationSourceUid);
+            return ['uid' => $createdUid, 'created' => true];
         }
 
         $errors = is_array($dataHandler->errorLog ?? null) ? implode('; ', $dataHandler->errorLog) : '';

@@ -14,6 +14,10 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 final class SelectionBasketSummaryService
 {
+    use PageScanLimitTrait;
+
+    private const PAGE_SCAN_LIMIT = 3000;
+
     public function __construct(
         private readonly ConnectionPool $connectionPool
     ) {}
@@ -311,9 +315,10 @@ final class SelectionBasketSummaryService
             )
             ->orderBy('pid', 'ASC')
             ->addOrderBy('sorting', 'ASC')
-            ->setMaxResults(3000)
+            ->setMaxResults(self::PAGE_SCAN_LIMIT + 1)
             ->executeQuery()
             ->fetchAllAssociative();
+        $rows = $this->capScannedPages($rows, self::PAGE_SCAN_LIMIT);
 
         $pages = [];
         foreach ($rows as $row) {

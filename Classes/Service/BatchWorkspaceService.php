@@ -235,13 +235,13 @@ final class BatchWorkspaceService
             ],
             'siteOptions' => $siteOptions,
             'languageOptions' => $languageOptions,
-            'languageOptionsJson' => json_encode((object)$this->languageOptionsById($languageOptions), JSON_THROW_ON_ERROR),
+            'languageOptionsJson' => $this->jsonForHtml((object)$this->languageOptionsById($languageOptions)),
             'siteSummary' => $this->pageTreeService->getSiteSummary((string)($site['label'] ?? $selection->siteIdentifier), $rootPageUid),
             'glossaryOptions' => $glossaryOptions,
-            'glossaryOptionsByCombinationJson' => json_encode((object)$this->resourceOptionService->getGlossaryOptionsByCombination(), JSON_THROW_ON_ERROR),
+            'glossaryOptionsByCombinationJson' => $this->jsonForHtml((object)$this->resourceOptionService->getGlossaryOptionsByCombination()),
             'styleRuleOptions' => $styleRuleOptions,
-            'styleRuleOptionsJson' => json_encode((object)$this->resourceOptionService->getStyleRuleDisplayOptions(), JSON_THROW_ON_ERROR),
-            'styleRuleOptionsByLanguageJson' => json_encode((object)$this->resourceOptionService->getStyleRuleOptionsByLanguage(), JSON_THROW_ON_ERROR),
+            'styleRuleOptionsJson' => $this->jsonForHtml((object)$this->resourceOptionService->getStyleRuleDisplayOptions()),
+            'styleRuleOptionsByLanguageJson' => $this->jsonForHtml((object)$this->resourceOptionService->getStyleRuleOptionsByLanguage()),
             'translationModes' => $this->translationModeOptions(),
             'statusFilters' => $this->statusFilterOptions(),
             'setupSummary' => $this->buildSetupSummary(
@@ -1063,5 +1063,18 @@ final class BatchWorkspaceService
     private function translate(string $key): string
     {
         return LocalizationUtility::translate($key, 'ppl_deepl_v3_batch_translation') ?? $key;
+    }
+
+    private function jsonForHtml(mixed $value): string
+    {
+        return json_encode(
+            $value,
+            JSON_THROW_ON_ERROR
+            | JSON_HEX_TAG
+            | JSON_HEX_AMP
+            | JSON_HEX_APOS
+            | JSON_HEX_QUOT
+            | JSON_UNESCAPED_SLASHES
+        );
     }
 }

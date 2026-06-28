@@ -6,6 +6,8 @@ services:
 
   Ppl\PplDeeplV3BatchTranslation\:
     resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/*'
 
   Ppl\PplDeeplV3BatchTranslation\Controller\:
     resource: '../Classes/Controller/*'

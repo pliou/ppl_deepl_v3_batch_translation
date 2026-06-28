@@ -19,7 +19,6 @@ final class SmokeFixtureService
     public const THIRD_LANGUAGE_ID = 2;
     public const ADMIN_USERNAME = 'bt_admin';
     public const LIMITED_USERNAME = 'bt_limited';
-    public const PASSWORD = 'BatchSmoke123!';
 
     public function __construct(
         private readonly ConnectionPool $connectionPool
@@ -31,7 +30,7 @@ final class SmokeFixtureService
     public function resetAndCreate(string $artifactRoot): array
     {
         $this->softDeleteExistingFixture();
-        $this->upsertBackendUsers();
+        $this->upsertBackendUsers($this->smokePassword());
 
         $now = time();
         $map = [
@@ -44,7 +43,6 @@ final class SmokeFixtureService
             'backendUsers' => [
                 'admin' => self::ADMIN_USERNAME,
                 'limited' => self::LIMITED_USERNAME,
-                'password' => self::PASSWORD,
             ],
         ];
 
@@ -416,10 +414,10 @@ TYPOSCRIPT;
         ]);
     }
 
-    private function upsertBackendUsers(): void
+    private function upsertBackendUsers(string $plainPassword): void
     {
         $hashFactory = GeneralUtility::makeInstance(PasswordHashFactory::class);
-        $password = (string)$hashFactory->getDefaultHashInstance('BE')->getHashedPassword(self::PASSWORD);
+        $password = (string)$hashFactory->getDefaultHashInstance('BE')->getHashedPassword($plainPassword);
         $connection = $this->connectionPool->getConnectionForTable('be_users');
         $now = time();
         foreach ([self::ADMIN_USERNAME => 1, self::LIMITED_USERNAME => 0] as $username => $admin) {
@@ -442,6 +440,16 @@ TYPOSCRIPT;
                 $connection->insert('be_users', $fields);
             }
         }
+    }
+
+    private function smokePassword(): string
+    {
+        $environmentPassword = trim((string)getenv('PPL_BATCH_TRANSLATION_SMOKE_PASSWORD'));
+        if ($environmentPassword !== '') {
+            return $environmentPassword;
+        }
+
+        return bin2hex(random_bytes(18));
     }
 
     private function insertPage(int $pid, string $title, string $slug, int $permsEveryBody, int $now, string $description = '', string $abstract = ''): int

@@ -20,6 +20,8 @@ CREATE TABLE tx_ppldeeplv3batchtranslation_job (
   translated_items int(11) DEFAULT '0' NOT NULL,
   created_by int(11) DEFAULT '0' NOT NULL,
   started_at int(11) DEFAULT '0' NOT NULL,
+  lease_token varchar(40) DEFAULT '' NOT NULL,
+  lease_renewed_at int(11) DEFAULT '0' NOT NULL,
   finished_at int(11) DEFAULT '0' NOT NULL,
   PRIMARY KEY (uid),
   KEY status (status),

@@ -132,22 +132,22 @@ final class BatchResultViewModelService
         fputcsv($handle, ['job_uid', 'item_uid', 'type', 'table', 'base_uid', 'source_uid', 'target_uid', 'source_language_id', 'target_language_id', 'status_code', 'error_code', 'error_message', 'record_action', 'written_fields', 'frontend_url', 'backend_url']);
         foreach ($result['rows'] as $row) {
             fputcsv($handle, [
-                $row['jobUid'],
-                $row['itemUid'],
-                $row['type'],
-                $row['table'],
-                $row['baseUid'],
-                $row['sourceUid'],
-                $row['targetUid'],
-                $row['sourceLanguageId'],
-                $row['targetLanguageId'],
-                $row['statusCode'],
-                $row['errorCode'],
-                $row['error'],
-                $row['recordAction'],
-                $row['writtenFields'],
-                $row['frontendUrl'],
-                $row['backendUrl'],
+                $this->csvCell($row['jobUid']),
+                $this->csvCell($row['itemUid']),
+                $this->csvCell($row['type']),
+                $this->csvCell($row['table']),
+                $this->csvCell($row['baseUid']),
+                $this->csvCell($row['sourceUid']),
+                $this->csvCell($row['targetUid']),
+                $this->csvCell($row['sourceLanguageId']),
+                $this->csvCell($row['targetLanguageId']),
+                $this->csvCell($row['statusCode']),
+                $this->csvCell($row['errorCode']),
+                $this->csvCell($row['error']),
+                $this->csvCell($row['recordAction']),
+                $this->csvCell($row['writtenFields']),
+                $this->csvCell($row['frontendUrl']),
+                $this->csvCell($row['backendUrl']),
             ]);
         }
 
@@ -156,6 +156,17 @@ final class BatchResultViewModelService
         fclose($handle);
 
         return is_string($csv) ? $csv : '';
+    }
+
+    private function csvCell(mixed $value): string|int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        $cell = (string)$value;
+
+        return preg_match('/^[=+\-@]/', $cell) === 1 ? '\'' . $cell : $cell;
     }
 
     /**

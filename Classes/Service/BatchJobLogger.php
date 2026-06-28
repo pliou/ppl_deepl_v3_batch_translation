@@ -18,6 +18,9 @@ final class BatchJobLogger
     private const JOB_TABLE = 'tx_ppldeeplv3batchtranslation_job';
     private const ITEM_TABLE = 'tx_ppldeeplv3batchtranslation_job_item';
 
+    /** A "running" job whose started_at is older than this is treated as crashed and reclaimed. */
+    private const LEASE_TIMEOUT_SECONDS = 3600;
+
     public function __construct(
         private readonly ConnectionPool $connectionPool
     ) {}
@@ -168,7 +171,146 @@ final class BatchJobLogger
 
     public function markStarted(int $jobUid): void
     {
-        $this->updateJobStatus($jobUid, 'running', ['started_at' => time()]);
+        $now = time();
+        $this->updateJobStatus($jobUid, 'running', [
+            'started_at' => $now,
+            'lease_token' => bin2hex(random_bytes(16)),
+            'lease_renewed_at' => $now,
+        ]);
+    }
+
+    /**
+     * Keep a running job's lease fresh so a legitimately long-running execution (longer than the
+     * lease window) is not mistaken for a crashed process and reclaimed mid-run.
+     */
+    public function heartbeat(int $jobUid): void
+    {
+        if ($jobUid <= 0) {
+            return;
+        }
+        $now = time();
+        $this->connectionPool->getConnectionForTable(self::JOB_TABLE)->update(
+            self::JOB_TABLE,
+            ['lease_renewed_at' => $now, 'tstamp' => $now],
+            ['uid' => $jobUid, 'status' => 'running']
+        );
+    }
+
+    /**
+     * Reclaim jobs stuck in "running" longer than the lease window (a crashed process never
+     * marks them finished). They become "interrupted" so they stop blocking and are cleaned up,
+     * instead of hanging in "running" forever. A job is only reclaimed when BOTH its start AND its
+     * last heartbeat are older than the lease window, so an actively heart-beating long run survives.
+     */
+    public function reclaimStaleRunningJobs(): int
+    {
+        $threshold = time() - self::LEASE_TIMEOUT_SECONDS;
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::JOB_TABLE);
+
+        return (int)$queryBuilder
+            ->update(self::JOB_TABLE)
+            ->set('status', 'interrupted')
+            ->set('tstamp', time())
+            ->where(
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('status', $queryBuilder->createNamedParameter('running')),
+                $queryBuilder->expr()->lt('started_at', $queryBuilder->createNamedParameter($threshold, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->lt('lease_renewed_at', $queryBuilder->createNamedParameter($threshold, \Doctrine\DBAL\ParameterType::INTEGER))
+            )
+            ->executeStatement();
+    }
+
+    /**
+     * Atomically claim a job for (chunked) execution: a fresh `previewed` job OR an `interrupted` one
+     * that is being resumed (after a crash/reclaim or a deliberate chunk pause). The atomic status
+     * transition guarantees only one worker can own the job at a time.
+     */
+    public function claimPreviewJobForExecution(int $jobUid): bool
+    {
+        if ($jobUid <= 0) {
+            return false;
+        }
+
+        $now = time();
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::JOB_TABLE);
+        $affectedRows = (int)$queryBuilder
+            ->update(self::JOB_TABLE)
+            ->set('status', 'running')
+            ->set('started_at', $now)
+            ->set('lease_token', bin2hex(random_bytes(16)))
+            ->set('lease_renewed_at', $now)
+            ->set('tstamp', $now)
+            ->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($jobUid, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->in('status', $queryBuilder->createNamedParameter(['previewed', 'interrupted'], \Doctrine\DBAL\ArrayParameterType::STRING))
+            )
+            ->executeStatement();
+
+        return $affectedRows === 1;
+    }
+
+    /**
+     * Pause a chunked run: more items remain, so the job goes back to the resumable `interrupted`
+     * state (kept lease-fresh) for the next execute run/scheduler tick to pick up.
+     */
+    public function pauseForResume(int $jobUid): void
+    {
+        $this->updateJobStatus($jobUid, 'interrupted', ['lease_renewed_at' => time()]);
+    }
+
+    /**
+     * Number of job items that have not been handled yet (processed_at still 0).
+     */
+    public function countUnprocessedItems(int $jobUid): int
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::ITEM_TABLE);
+
+        return (int)$queryBuilder
+            ->count('uid')
+            ->from(self::ITEM_TABLE)
+            ->where(
+                $queryBuilder->expr()->eq('job_uid', $queryBuilder->createNamedParameter($jobUid, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('processed_at', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER))
+            )
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    /**
+     * Recompute the job's persisted counters from the actual item statuses (single source of truth),
+     * so the totals are correct whether the job ran in one pass, was resumed, or ran in chunks.
+     *
+     * @return array{processed_items: int, translated_items: int, blocked_items: int, skipped_items: int, failed_items: int}
+     */
+    public function countExecutedItems(int $jobUid): array
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::ITEM_TABLE);
+        $rows = $queryBuilder
+            ->select('status')
+            ->addSelectLiteral($queryBuilder->expr()->count('uid', 'cnt'))
+            ->from(self::ITEM_TABLE)
+            ->where(
+                $queryBuilder->expr()->eq('job_uid', $queryBuilder->createNamedParameter($jobUid, \Doctrine\DBAL\ParameterType::INTEGER)),
+                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER))
+            )
+            ->groupBy('status')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $byStatus = [];
+        foreach ($rows as $row) {
+            $byStatus[(string)$row['status']] = (int)$row['cnt'];
+        }
+
+        return [
+            'processed_items' => ($byStatus['translated'] ?? 0) + ($byStatus['localized'] ?? 0),
+            'translated_items' => $byStatus['translated'] ?? 0,
+            'blocked_items' => $byStatus['blocked'] ?? 0,
+            'skipped_items' => $byStatus['skipped'] ?? 0,
+            'failed_items' => $byStatus['failed'] ?? 0,
+        ];
     }
 
     public function markFinished(int $jobUid, array $counters): void
@@ -204,7 +346,7 @@ final class BatchJobLogger
             ->from(self::JOB_TABLE)
             ->where(
                 $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, \Doctrine\DBAL\ParameterType::INTEGER)),
-                $queryBuilder->expr()->in('status', $queryBuilder->createNamedParameter(['finished', 'discarded', 'preview_failed'], \Doctrine\DBAL\ArrayParameterType::STRING)),
+                $queryBuilder->expr()->in('status', $queryBuilder->createNamedParameter(['finished', 'discarded', 'preview_failed', 'interrupted'], \Doctrine\DBAL\ArrayParameterType::STRING)),
                 $queryBuilder->expr()->lt('tstamp', $queryBuilder->createNamedParameter($olderThanTimestamp, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->executeQuery()

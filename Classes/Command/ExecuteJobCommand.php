@@ -31,6 +31,7 @@ final class ExecuteJobCommand extends Command
             ->addOption('job', null, InputOption::VALUE_REQUIRED, 'Preview job UID to execute.')
             ->addOption('be-user', null, InputOption::VALUE_REQUIRED, 'Backend user UID used for permission checks.')
             ->addOption('hidden', null, InputOption::VALUE_NONE, 'Keep written target records hidden.')
+            ->addOption('max-items', null, InputOption::VALUE_REQUIRED, 'Process at most N still-pending items per run (chunked execution); the job is resumed until it is finished. Omit to process the whole job in one pass.')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Required safety confirmation for CLI writes.');
     }
 
@@ -49,8 +50,15 @@ final class ExecuteJobCommand extends Command
         $backendUser->fetchGroupData();
         $GLOBALS['BE_USER'] = $backendUser;
 
-        $result = $this->executionService->executePreviewJob($jobUid, !(bool)$input->getOption('hidden'));
-        $output->writeln(sprintf('<%s>%s</%s>', $result['type'] === 'error' ? 'error' : 'info', $result['text'], $result['type'] === 'error' ? 'error' : 'info'));
+        $maxItems = $input->getOption('max-items') !== null ? max(1, (int)$input->getOption('max-items')) : null;
+        $makeVisible = !(bool)$input->getOption('hidden');
+
+        // With --max-items the job runs in chunks: each call processes a chunk and pauses ('info'),
+        // and we resume until it is finished. Without it, one call processes the whole job.
+        do {
+            $result = $this->executionService->executePreviewJob($jobUid, $makeVisible, $maxItems);
+            $output->writeln(sprintf('<%s>%s</%s>', $result['type'] === 'error' ? 'error' : 'info', $result['text'], $result['type'] === 'error' ? 'error' : 'info'));
+        } while ($result['type'] === 'info');
 
         return $result['type'] === 'error' ? Command::FAILURE : Command::SUCCESS;
     }

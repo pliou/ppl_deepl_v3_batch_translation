@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ppl\PplDeeplV3BatchTranslation\Domain\Dto;
 
+use Ppl\PplDeeplV3Requests\Domain\Dto\DeepLRequestContext;
+
 final class TranslationBatchRequest
 {
     /**
@@ -17,6 +19,7 @@ final class TranslationBatchRequest
         public readonly ?string $glossaryId,
         public readonly string $styleRuleId,
         public readonly string $tagHandling,
-        public readonly array $customInstructions
+        public readonly array $customInstructions,
+        public readonly DeepLRequestContext $context
     ) {}
 }

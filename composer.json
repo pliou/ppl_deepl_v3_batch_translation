@@ -12,6 +12,7 @@
   ],
   "require": {
     "php": ">=8.2",
+    "ext-mbstring": "*",
     "ppl/ppl-deepl-v3-requests": "^13.4",
     "typo3/cms-backend": "^13.4",
     "typo3/cms-core": "^13.4",

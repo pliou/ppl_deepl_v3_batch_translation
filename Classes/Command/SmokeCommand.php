@@ -42,6 +42,12 @@ final class SmokeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->canRunInCurrentContext()) {
+            $output->writeln('<error>Batch translation smoke fixtures are only allowed in TYPO3 Development or Testing context.</error>');
+
+            return Command::FAILURE;
+        }
+
         if ((bool)$input->getOption('deactivate-fake')) {
             $this->context->deactivate();
             $output->writeln('<info>Smoke Fake DeepL context deactivated.</info>');
@@ -100,5 +106,12 @@ final class SmokeCommand extends Command
         $output->writeln('<comment>Fixture prepared. Pass --run-matrix to execute smoke cases.</comment>');
 
         return Command::SUCCESS;
+    }
+
+    private function canRunInCurrentContext(): bool
+    {
+        $context = Environment::getContext();
+
+        return $context->isDevelopment() || $context->isTesting();
     }
 }

@@ -1,0 +1,14 @@
+name: CI
+on:
+  push:
+    branches: ['12.4', '13.4', '14.3']
+  pull_request:
+  workflow_dispatch:
+jobs:
+  qa:
+    uses: pliou/ppl-ci-public/.github/workflows/typo3-package-ci.yml@main
+    with:
+      php-version: '8.4'
+      phpstan-level: '5'
+      composer-vcs-repos: 'https://github.com/pliou/ppl_deepl_v3_requests'
+    secrets: inherit
